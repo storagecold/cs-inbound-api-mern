@@ -33,7 +33,10 @@ app.use((req, res, next) => {
 });
 
 const userAuthRoutes = require("./app/routes/UserAuth");
+const accountRoutes = require("./app/routes/AccountRoute");
+
 app.use("/api/v1/users", userAuthRoutes);
+app.use("/api/v1/accounts", accountRoutes);
 
   const server = http.listen(process.env.PORT, function () {
     console.log(chalk.green("✓"), " App is running at", process.env.PORT);

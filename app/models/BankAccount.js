@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const BankAccountSchema = new Schema({
   accountNumber: String,
-  accountName: String,
+  accountHolderName: String,
   bankName: String,
   branchName: String,
   ifscCode: String,

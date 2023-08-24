@@ -12,24 +12,19 @@ const AccountSchema = new Schema({
     },
     careOfName: String,
     address: Object,
-    profilePic: Object,
     type: {
         type: String,
         enum: ['kisan', 'staff', 'others']
     },
-    amad: {
-        type: Schema.Types.ObjectId,
-        ref: 'Amad',
-        index: true
-    },
+  
     bankAccount: [{
         type: Schema.Types.ObjectId,
         ref: 'BankAccount',
         index: true
     }],
 
-
     isDeleted: { type: Boolean, default: false },
+    deletedAt: { type: Date, default: null },
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: 'User'
