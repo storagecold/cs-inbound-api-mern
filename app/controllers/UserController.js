@@ -3,7 +3,7 @@ const AccessTokenObj = require('../models/userAuth/AccessToken')
 const ForgotPasswordObj = require("../models/userAuth/ForgotPassword");
 
 const constantObj = require("../config/Constants");
-const globalModules = require("./../helpers/globalModules");
+const globalModules = require("../helpers/globalModules");
 
 exports.Login = async (req, res) => {
   try {
