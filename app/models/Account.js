@@ -16,15 +16,18 @@ const AccountSchema = new Schema({
         type: String,
         enum: ['kisan', 'staff', 'others']
     },
-  
-    bankAccount: [{
-        type: Schema.Types.ObjectId,
-        ref: 'BankAccount',
-        index: true
-    }],
 
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null },
+
+    organization: {
+        type: Schema.Types.ObjectId,
+        ref: 'Organization'
+    },
+    company: {
+        type: Schema.Types.ObjectId,
+        ref: 'Company'
+    },
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: 'User'
