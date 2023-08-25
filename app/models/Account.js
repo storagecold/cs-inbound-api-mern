@@ -1,22 +1,34 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const RunningNumberObj = require('./RunningNumbers')
+
 const AccountSchema = new Schema({
     accountNumber: Number,
     firstName: String,
     lastName: String,
     mobile: String,
     careOf: {
-        type: String,
-        enum: ['S/O', 'W/O', 'D/O']
+      type: String,
+      enum: ["S/O", "W/O", "D/O"],
     },
     careOfName: String,
     address: Object,
     type: {
-        type: String,
-        enum: ['kisan', 'staff', 'others']
+      type: String,
+      enum: ["kisan", "staff", "others"],
     },
-
+    amad: {
+      type: Schema.Types.ObjectId,
+      ref: "Amad",
+      index: true,
+    },
+    bankAccount: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "BankAccount",
+        index: true,
+      },
+    ],
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null },
 
@@ -29,14 +41,16 @@ const AccountSchema = new Schema({
         ref: 'Company'
     },
     createdBy: {
-        type: Schema.Types.ObjectId,
-        ref: 'User'
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
     updatedBy: {
-        type: Schema.Types.ObjectId,
-        ref: 'User'
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
-}, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
 // // Middleware to generate and set accountNumber before saving
 // AccountSchema.pre('save', async function (next) {

@@ -1,24 +1,85 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-
-const AmadSchema = new Schema({
-    organization: {
-        type: Schema.Types.ObjectId,
-        ref: 'Organization'
-    },
+const mongoose = require("mongoose");
+const amadShcema = new mongoose.Schema(
+  {
     company: {
-        type: Schema.Types.ObjectId,
-        ref: 'Company'
+      type: Schema.Types.ObjectId,
+      ref: "Company",
+      index: true,
     },
-    account: {
+	    account: {
         type: Schema.Types.ObjectId,
         ref: 'Account',
     },
-    amadNo: Number,
-    lotNumber: String,
-    packet: Number,
-    year: String
-}, { timestamps: true });
+    amadNo: {
+      type: Number,
+      required: true,
+      unique: true,
+      index: true,
+    },
+    party: {
+      type: String,
+      required: true,
+      minlength: 3,
+      index: true,
+    },
+    village: {
+      type: String,
+      required: true,
+      minlength: 3,
+      index: true,
+    },
+    packets: {
+      type: Number,
+      required: true,
+    },
+    commodity: {
+      type: String,
+      required: true,
+    },
+    kism: {
+      type: String,
+    },
+    lotNo: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    year: {
+      type: Number,
+      min: 1970,
+      max: 9999,
+      required: true,
+      index: true,
+      validate: function (val) {
+        return val.toString().length === 4 && val >= 1970;
+      },
+      message: (val) => `${val.value} length is ===4`,
+    },
+    chamberNo: {
+      type: Number,
+      required: true,
+      index: true,
+    },
+    chatta: {
+      type: String,
+      index: true,
+    },
+    gulla: {
+      type: String,
+      index: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now(),
+      required: true,
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now(),
+      required: true,
+    },
+  },
+  { collection: "amad" }
+);
 
-const AmadObj = mongoose.model('Amad', AmadSchema);
-module.exports = AmadObj;
+module.exports = mongoose.model("amad", amadShcema);
