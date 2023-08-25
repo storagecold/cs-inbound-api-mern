@@ -3,9 +3,9 @@ const Schema = mongoose.Schema;
 
 const RunningNumberSchema = new Schema({
     accountNumberKey: String,
-    accountNumberValue: Number,
+    accountNumberValue: {type:Number,default:1000},
     amadNumberKey: String,
-    amadNumberValue: Number,
+    amadNumberValue: {type:Number,default:100},
 
 }, { timestamps: true });
 

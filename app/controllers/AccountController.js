@@ -1,30 +1,7 @@
 const AccountObj = require('../models/Account');
 const globalModules = require('../helpers/globalModules');
 const Joi = require('joi');
- 
- const schema = Joi.object({
-    accountNumber: Joi.number().required(),
-    firstName: Joi.string().trim().required(),
-    lastName: Joi.string().trim().required(),
-    mobile: Joi.string().trim().required(),
-    careOf: Joi.string().valid('S/O', 'W/O', 'D/O').trim(),
-    careOfName: Joi.string().trim(),
-    address: Joi.object({
-        street: Joi.string().trim(),
-        city: Joi.string().trim(),
-        state: Joi.string().trim(),
-        postalCode: Joi.string().trim(),
-        country: Joi.string().trim()
-    }),
-    type: Joi.string().valid('kisan', 'staff', 'others').trim(),
-    bankAccount: Joi.array().items(Joi.object({
-        accountHolderName: Joi.string().trim().required(),
-        accountNumber: Joi.string().trim().required(),
-        bankName: Joi.string().trim().required(),
-        branch: Joi.string().trim().required(),
-        ifscCode: Joi.string().trim().required()
-    })),
-});
+const RunningNumberObj = require('../models/RunningNumbers');
 
 exports.createAccount = async (req, res) => {
     try {
@@ -35,7 +12,16 @@ exports.createAccount = async (req, res) => {
         if (value.firstName) {
             value.firstName = globalModules.firstLetterCapital(value.firstName);
         }
-        const accountExists = await AccountObj.exists({ accountNumber: value.accountNumber });
+        if (value.lastName) {
+            value.lastName = globalModules.firstLetterCapital(value.lastName);
+        }
+        value.accountNumber = await getAccountNumber();
+        let query = {
+            firstName: value.firstName,
+            careOfName: value.careOfName,
+            "address.village": value.address.village
+        }
+        const accountExists = await AccountObj.findOne(query);
 
         if (accountExists) {
             return res.status(400).json({ status: 'error', message: 'Account with this account number already exists.' });
@@ -129,7 +115,7 @@ exports.getAccountsList = async (req, res) => {
                     { accountNumber: search },
                     { firstName: { $regex: search, $options: 'i' } },
                     { lastName: { $regex: search, $options: 'i' } },
-                    { 'address.city': { $regex: search, $options: 'i' } } 
+                    { 'address.city': { $regex: search, $options: 'i' } }
                 ]
             };
         }
@@ -171,5 +157,43 @@ exports.searchAccountsList = async (req, res) => {
         res.json({ status: 'success', data: accountsList, totalCount });
     } catch (error) {
         res.status(500).json({ status: 'error', message: 'Error fetching accounts list.' });
+    }
+};
+
+
+const schema = Joi.object({
+    firstName: Joi.string().trim().required(),
+    lastName: Joi.string().trim().required(),
+    mobile: Joi.string().trim().required(),
+    careOf: Joi.string().valid('S/O', 'W/O', 'D/O').trim(),
+    careOfName: Joi.string().trim(),
+    address: Joi.object({
+        village: Joi.string().trim(),
+        city: Joi.string().trim(),
+        state: Joi.string().trim(),
+        pinCode: Joi.string().trim(),
+
+    }),
+    type: Joi.string().valid('kisan', 'staff', 'others').trim(),
+    bankAccount: Joi.array().items(Joi.object({
+        accountHolderName: Joi.string().trim().required(),
+        accountNumber: Joi.string().trim().required(),
+        bankName: Joi.string().trim().required(),
+        branch: Joi.string().trim().required(),
+        ifscCode: Joi.string().trim().required()
+    })),
+});
+// Function to get the next account number
+const getAccountNumber = async () => {
+    const update = { $inc: { accountNumberValue: 1 } };
+    const options = { new: true, upsert: true }; 
+    const query = { accountNumberKey: "accountNumberValue" };
+
+    const runningNumber = await RunningNumberObj.findOneAndUpdate(query, update, options).exec();
+
+    if (runningNumber) {
+        return runningNumber.accountNumberValue;
+    } else {
+        return 99999;
     }
 };
