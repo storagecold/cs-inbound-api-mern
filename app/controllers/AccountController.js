@@ -18,10 +18,13 @@ exports.createAccount = async (req, res) => {
         const newAccount = new AccountObj(value);
         const savedAccount = await newAccount.save();
 
-        res.json({ status: 'success', data: savedAccount });
+      res.json({ status: "success", data: savedAccount });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error saving account data.' });
+      res
+        .status(500)
+        .json({ status: "error", message: "Error saving account data." });
     }
+    
 };
 
 exports.updateAccount = async (req, res) => {
