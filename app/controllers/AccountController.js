@@ -5,35 +5,48 @@ const RunningNumberObj = require('../models/RunningNumbers');
 
 exports.createAccount = async (req, res) => {
     try {
-        const { error, value } = schema.validate(req.body);
-        if (error) {
-            return res.status(400).json({ status: 'error', message: error.details[0].message });
-        }
-        if (value.firstName) {
-            value.firstName = globalModules.firstLetterCapital(value.firstName);
-        }
-        if (value.lastName) {
-            value.lastName = globalModules.firstLetterCapital(value.lastName);
-        }
-        value.accountNumber = await getAccountNumber();
-        let query = {
-            firstName: value.firstName,
-            careOfName: value.careOfName,
-            "address.village": value.address.village
-        }
-        const accountExists = await AccountObj.findOne(query);
+      //move validation logic to another module , like /validation.js
+      const { error, value } = schema.validate(req.body);
+      if (error) {
+        return res
+          .status(400)
+          .json({ status: "error", message: error.details[0].message });
+      }
+      //TODO , No need to put check as this already taken care by  joy schema.
+      if (value.firstName) {
+        value.firstName = globalModules.firstLetterCapital(value.firstName);
+      }
+      //TODO , No need to put check as this already taken care by  joy schema.
+      if (value.lastName) {
+        value.lastName = globalModules.firstLetterCapital(value.lastName);
+      }
+      value.accountNumber = await getAccountNumber();
 
-        if (accountExists) {
-            return res.status(400).json({ status: 'error', message: 'Account with this account number already exists.' });
-        }
+      //TODO  --> put this logic in validation method to check duplicate  checkDuplicate.
+      let query = {
+        firstName: value.firstName,
+        careOfName: value.careOfName,
+        "address.village": value.address.village,
+      };
+      const accountExists = await AccountObj.findOne(query);
 
-        const newAccount = new AccountObj(value);
-        const savedAccount = await newAccount.save();
+      if (accountExists) {
+        return res.status(400).json({
+          status: "error",
+          message: "Account with this account number already exists.",
+        });
+      }
+      //
+      const newAccount = new AccountObj(value);
+      const savedAccount = await newAccount.save();
 
-        res.json({ status: 'success', data: savedAccount });
+      res.json({ status: "success", data: savedAccount });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error saving account data.' });
+      res
+        .status(500)
+        .json({ status: "error", message: "Error saving account data." });
     }
+    
 };
 
 exports.updateAccount = async (req, res) => {
