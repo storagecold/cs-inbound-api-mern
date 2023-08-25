@@ -6,6 +6,10 @@ const amadShcema = new mongoose.Schema(
       ref: "Company",
       index: true,
     },
+	    account: {
+        type: Schema.Types.ObjectId,
+        ref: 'Account',
+    },
     amadNo: {
       type: Number,
       required: true,
