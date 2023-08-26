@@ -1,39 +1,30 @@
 const AccountObj = require('../models/Account');
 const globalModules = require('../helpers/globalModules');
 const Joi = require('joi');
-const RunningNumberObj = require('../models/RunningNumbers');
-
+const Utils = require('../utils/AccountUtils')
 exports.createAccount = async (req, res) => {
     try {
-        const { error, value } = schema.validate(req.body);
+        const { error, value } = Utils.AccountValidate(req.body);
         if (error) {
             return res.status(400).json({ status: 'error', message: error.details[0].message });
         }
-        if (value.firstName) {
-            value.firstName = globalModules.firstLetterCapital(value.firstName);
-        }
-        if (value.lastName) {
-            value.lastName = globalModules.firstLetterCapital(value.lastName);
-        }
-        value.accountNumber = await getAccountNumber();
-        let query = {
-            firstName: value.firstName,
-            careOfName: value.careOfName,
-            "address.village": value.address.village
-        }
-        const accountExists = await AccountObj.findOne(query);
-
+        value.firstName = globalModules.firstLetterCapital(value.firstName);
+        value.lastName = globalModules.firstLetterCapital(value.lastName);
+       const accountExists= await Utils.AccountExists(value,res);
         if (accountExists) {
-            return res.status(400).json({ status: 'error', message: 'Account with this account number already exists.' });
+            return res.status(400).json({ status: 'error', message: 'Account with this details already exists.' });
         }
-
+       await Utils.GetAccountNumber(value);
         const newAccount = new AccountObj(value);
         const savedAccount = await newAccount.save();
 
-        res.json({ status: 'success', data: savedAccount });
+      res.json({ status: "success", data: savedAccount });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error saving account data.' });
+      res
+        .status(500)
+        .json({ status: "error", message: "Error saving account data." });
     }
+    
 };
 
 exports.updateAccount = async (req, res) => {
@@ -183,17 +174,3 @@ const schema = Joi.object({
         ifscCode: Joi.string().trim().required()
     })),
 });
-// Function to get the next account number
-const getAccountNumber = async () => {
-    const update = { $inc: { accountNumberValue: 1 } };
-    const options = { new: true, upsert: true }; 
-    const query = { accountNumberKey: "accountNumberValue" };
-
-    const runningNumber = await RunningNumberObj.findOneAndUpdate(query, update, options).exec();
-
-    if (runningNumber) {
-        return runningNumber.accountNumberValue;
-    } else {
-        return 99999;
-    }
-};
