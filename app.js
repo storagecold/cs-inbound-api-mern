@@ -39,14 +39,17 @@ const { swaggerServe, swaggerSetup } = require("./swagger/swaggerConfig");
 app.use("/api/v1/swagger-ui", swaggerServe, swaggerSetup);
 
 const userAuthRoutes = require("./app/routes/UserRoute");
+const organizationRoutes = require("./app/routes/OrganizationRoutes");
 const accountRoutes = require("./app/routes/AccountRoute");
+const amadRoutes = require("./app/routes/AmadRoute");
 
 app.use("/api/v1/", userAuthRoutes);
+app.use("/api/v1/", organizationRoutes);
 app.use("/api/v1", accountRoutes);
+app.use("/api/v1", amadRoutes);
 
-  const server = http.listen(process.env.PORT, function () {
-    console.log(chalk.green("✓"), " App is running at", process.env.PORT);
-  });
-  
-  io.listen(server);
-  
+const server = http.listen(process.env.PORT, function () {
+  console.log(chalk.green("✓"), " App is running at", process.env.PORT);
+});
+
+io.listen(server);

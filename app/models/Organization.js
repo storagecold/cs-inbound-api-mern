@@ -8,7 +8,12 @@ const OrganizationSchema = new Schema({
     mobile: String,
     industry: String,
     website: String,
-    address: Object,
+    address: {
+        city:String,
+        district:String,
+        state:String,
+        pinCode:String
+    },
     logo: Object,
     owner: [String],
     isDeleted: { type: Boolean, default: false }

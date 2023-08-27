@@ -1,85 +1,74 @@
 const mongoose = require("mongoose");
-const amadShcema = new mongoose.Schema(
+
+const amadSchema = new mongoose.Schema(
   {
     company: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
-      index: true,
+      index: true
     },
-	    account: {
-        type: Schema.Types.ObjectId,
-        ref: 'Account',
+    account: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Account',
+      index: true
     },
     amadNo: {
       type: Number,
-      required: true,
       unique: true,
-      index: true,
-    },
-    party: {
-      type: String,
-      required: true,
-      minlength: 3,
-      index: true,
-    },
-    village: {
-      type: String,
-      required: true,
-      minlength: 3,
-      index: true,
+      index: true
     },
     packets: {
       type: Number,
-      required: true,
+      required: true
     },
-    commodity: {
-      type: String,
-      required: true,
-    },
-    kism: {
-      type: String,
-    },
+    kism: [{ type: String }],
     lotNo: {
       type: String,
-      required: true,
-      index: true,
     },
     year: {
       type: Number,
-      min: 1970,
-      max: 9999,
-      required: true,
-      index: true,
-      validate: function (val) {
-        return val.toString().length === 4 && val >= 1970;
-      },
-      message: (val) => `${val.value} length is ===4`,
+      index: true
     },
     chamberNo: {
       type: Number,
       required: true,
       index: true,
+      default: 1,
+      enum: [1, 2, 3, 4]
     },
-    chatta: {
+    grading: {
       type: String,
+      enum: ["CHATTA", "GULLA", "KIRRI", "MIX"],
       index: true,
+      default:"MIX"
     },
-    gulla: {
-      type: String,
-      index: true,
+    isDeleted: {
+      type: Boolean,
+      default: false
     },
-    createdAt: {
+    deletedAt: {
       type: Date,
-      default: Date.now(),
-      required: true,
+      default: null
     },
-    updatedAt: {
-      type: Date,
-      default: Date.now(),
-      required: true,
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
     },
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }
   },
-  { collection: "amad" }
+  { timestamps: true }
 );
 
-module.exports = mongoose.model("amad", amadShcema);
+amadSchema.pre('save', function (next) {
+  const currentDate = new Date();
+  this.year = currentDate.getFullYear();
+  this.lotNo = `${this.amadNo}/${this.packets}`;
+  next();
+});
+
+const AmadObj = mongoose.model("Amad", amadSchema);
+
+module.exports = AmadObj;
