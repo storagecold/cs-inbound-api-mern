@@ -12,7 +12,6 @@ module.exports = {
         return await AccountObj.findOne(query);
     },
 
-    // Function to get the next account number
     GetAccountNumber: async (value) => {
         const update = { $inc: { accountNumberValue: 1 } };
         const options = { new: true, upsert: true };
