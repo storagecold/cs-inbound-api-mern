@@ -9,6 +9,6 @@ router.put('/amads', checkAuth, AmadController.updateAmad);
 router.delete('/amads/:amadNo', checkAuth,AmadController.deleteAmad);
 router.get('/amads/:amadNo', checkAuth, AmadController.getAmadByNumber);
 router.get('/amads', checkAuth, AmadController.getAmadsList);
-router.post('/amads', checkAuth, AmadController.searchAmad);
+router.post('/amads/search', checkAuth, AmadController.searchAmad);
 
 module.exports = router;

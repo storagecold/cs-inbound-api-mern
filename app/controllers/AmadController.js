@@ -44,7 +44,7 @@ exports.updateAmad = async (req, res) => {
 exports.deleteAmad = async (req, res) => {
     try {
         const { amadNo } = req.params;
-        const amadToSoftDelete = await AmadObj.findOne({ amadNo });
+        const amadToSoftDelete = await AmadObj.findOne({ amadNo },{isDeleted:1});
 
         if (!amadToSoftDelete) {
             return res.status(404).json({ status: 'error', message: 'Amad not found.' });
@@ -90,7 +90,7 @@ exports.getAmadByNumber = async (req, res) => {
 
 exports.searchAmad = async (req, res) => {
     try {
-        const { search } = req.query;
+        const { search } = req.body;
         const trimmedSearch = search ? search.trim() : '';
 
         let query = {};
