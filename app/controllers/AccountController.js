@@ -47,7 +47,7 @@ exports.updateAccount = async (req, res) => {
     }
 };
 
-exports.DeleteAccount = async (req, res) => {
+exports.deleteAccount = async (req, res) => {
     try {
         const { accountNumber } = req.params;
         const accountToSoftDelete = await AccountObj.findOne({ accountNumber });
@@ -94,34 +94,7 @@ exports.getAccountByNumber = async (req, res) => {
     }
 };
 
-
-exports.getAccountsList = async (req, res) => {
-    try {
-        const { search } = req.query;
-        let query = {};
-
-        if (search) {
-            query = {
-                $or: [
-                    { accountNumber: search },
-                    { firstName: { $regex: search, $options: 'i' } },
-                    { lastName: { $regex: search, $options: 'i' } },
-                    { 'address.city': { $regex: search, $options: 'i' } }
-                ]
-            };
-        }
-        const totalCount = await AccountObj.countDocuments(query);
-
-        // Fetch accounts based on the search query
-        const accountsList = await AccountObj.find(query);
-
-        res.json({ status: 'success', data: accountsList, totalCount });
-    } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error fetching accounts list.' });
-    }
-};
-
-exports.searchAccountsList = async (req, res) => {
+exports.searchAccount = async (req, res) => {
     try {
         const { search } = req.query;
         const trimmedSearch = search ? search.trim() : '';
@@ -134,7 +107,7 @@ exports.searchAccountsList = async (req, res) => {
                     { accountNumber: trimmedSearch },
                     { firstName: { $regex: trimmedSearch, $options: 'i' } },
                     { lastName: { $regex: trimmedSearch, $options: 'i' } },
-                    { 'address.city': { $regex: trimmedSearch, $options: 'i' } }
+                    { 'address.village': { $regex: trimmedSearch, $options: 'i' } }
                 ]
             };
         }
@@ -152,25 +125,3 @@ exports.searchAccountsList = async (req, res) => {
 };
 
 
-const schema = Joi.object({
-    firstName: Joi.string().trim().required(),
-    lastName: Joi.string().trim().required(),
-    mobile: Joi.string().trim().required(),
-    careOf: Joi.string().valid('S/O', 'W/O', 'D/O').trim(),
-    careOfName: Joi.string().trim(),
-    address: Joi.object({
-        village: Joi.string().trim(),
-        city: Joi.string().trim(),
-        state: Joi.string().trim(),
-        pinCode: Joi.string().trim(),
-
-    }),
-    type: Joi.string().valid('kisan', 'staff', 'others').trim(),
-    bankAccount: Joi.array().items(Joi.object({
-        accountHolderName: Joi.string().trim().required(),
-        accountNumber: Joi.string().trim().required(),
-        bankName: Joi.string().trim().required(),
-        branch: Joi.string().trim().required(),
-        ifscCode: Joi.string().trim().required()
-    })),
-});

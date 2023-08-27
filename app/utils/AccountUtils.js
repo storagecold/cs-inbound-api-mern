@@ -20,33 +20,41 @@ module.exports = {
 
         const runningNumber = await RunningNumberObj.findOneAndUpdate(query, update, options).exec();
 
-         value.accountNumber = runningNumber ? runningNumber.accountNumberValue : 99999
+        value.accountNumber = runningNumber ? runningNumber.accountNumberValue : 99999
     },
 
-    AccountValidate: function(body){
-        const schema = Joi.object({
-            firstName: Joi.string().trim().required(),
-            lastName: Joi.string().trim().required(),
-            mobile: Joi.string().trim().required(),
-            careOf: Joi.string().valid('S/O', 'W/O', 'D/O').trim(),
-            careOfName: Joi.string().trim(),
-            address: Joi.object({
-                village: Joi.string().trim(),
-                city: Joi.string().trim(),
-                state: Joi.string().trim(),
-                pinCode: Joi.string().trim(),
-        
-            }),
-            type: Joi.string().valid('kisan', 'staff', 'others').trim(),
-            bankAccount: Joi.array().items(Joi.object({
-                accountHolderName: Joi.string().trim().required(),
-                accountNumber: Joi.string().trim().required(),
-                bankName: Joi.string().trim().required(),
-                branch: Joi.string().trim().required(),
-                ifscCode: Joi.string().trim().required()
-            })),
+    AccountValidate: function (body) {
+        const addressSchema = Joi.object({
+            village: Joi.string(),
+            city: Joi.string(),
+            district: Joi.string(),
+            state: Joi.string(),
+            pinCode: Joi.number().integer()
         });
-   return schema.validate(body)
-       
+        const bankAccountSchema = Joi.string().pattern(/^[0-9a-fA-F]{24}$/);
+
+        const schema = Joi.object({
+            company: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
+            type: Joi.string().valid('kisan', 'staff', 'others'),
+            accountNumber: Joi.number().integer().required(),
+            firstName: Joi.string().allow(''),
+            lastName: Joi.string().allow(''),
+            careOf: Joi.string().valid('S/O', 'W/O', 'D/O'),
+            careOfName: Joi.string().allow(''),
+            address: addressSchema,
+            mobile: Joi.string().allow(''),
+            adharNo: Joi.number().integer().allow(null),
+            panNO: Joi.string().allow(''),
+            email: Joi.string().email().allow(''),
+            bankAccount: Joi.array().items(bankAccountSchema),
+            isDeleted: Joi.boolean(),
+            deletedAt: Joi.date().allow(null),
+            createdBy: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).allow(null),
+            updatedBy: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).allow(null)
+        });
+
+
+        return schema.validate(body)
+
     }
 }
