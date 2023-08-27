@@ -9,7 +9,7 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
 
-const errorHandler = (message = constantObj.messages.ErrorRetreivingData) => {
+const errorHandler = (message = constantObj.messages.ErrorRetrievingData) => {
     return {
         status: "failure",
         messageId: 203,
