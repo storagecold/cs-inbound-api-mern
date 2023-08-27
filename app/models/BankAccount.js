@@ -13,6 +13,8 @@ const BankAccountSchema = new Schema({
   ifscCode: String,
   isDeleted: { type: Boolean, default: false },
   deletedAt: { type: Date, default: null },
+  createdBy: { type: Schema.Types.ObjectId, ref: "User" },
+  updatedBy: { type: Schema.Types.ObjectId, ref: "User" },
 }, { timestamps: true });
 
 const BankAccountObj = mongoose.model('BankAccount', BankAccountSchema);

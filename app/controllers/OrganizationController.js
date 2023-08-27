@@ -30,8 +30,8 @@ exports.updateOrganization = async (req, res) => {
       if (req.body.name) {
           req.body.name = globalModules.firstLetterCapital(req.body.name);
       }
-      const { _id } = req.body;
-      const existingOrganization = await OrganizationObj.findOne({ _id });
+      const { id } = req.body;
+      const existingOrganization = await OrganizationObj.findOne({ _id:id });
 
       if (!existingOrganization) {
           return res.status(404).json({ status: 'error', message: 'Organization not found.' });
