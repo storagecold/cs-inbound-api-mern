@@ -97,13 +97,13 @@ exports.getAccountsList = async (req, res) => {
 
         let query = {
             company: companyId,
-            deleted: false
+            isDeleted: false
         }
 
         const data = await AccountObj.find(query)
-        .populate('customer', 'name')
-        .populate('createdBy', 'firstName lastName')
-        .populate('updatedBy', 'firstName lastName')
+        .populate('company', 'name')
+        .populate('createdBy', 'role email')
+        .populate('updatedBy', 'role email')
         .skip((perPage * page) - perPage)
         .limit(perPage)
         .sort({ updatedAt: -1 });
