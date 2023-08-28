@@ -10,6 +10,7 @@ const messages = {
     "VerificationEmail": "We have sent a verification code to your email address",
     "VerificationPhone": "We have sent a verification code to your mobile phone number.",
     "AddUser": "User has been added successfully.",
+    "RestorSuccess": " has been restored successfully.",
     "ForgotPassword": "An email with instructions has been sent to your email address. Follow those instructions to reset your password.",
     "PasswordResetFailed": "Your request does't process. Please try again later.",
     "PasswordResetSuccess": "Your password has been reset successfully.",

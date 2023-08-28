@@ -2,102 +2,179 @@ const CompanyObj = require('../models/Company');
 const globalModules = require('../helpers/globalModules');
 const Utils = require('../utils/CompanyUtils');
 const ComapanyObj = require('../models/Company');
+const constantObj = require('../config/Constants')
 
 exports.createCompany = async (req, res) => {
     try {
+
         const { error, value } = Utils.ComapnyValidate(req.body);
         if (error) {
-            return res.status(400).json({ status: 'error', message: error.details[0].message });
+            return res.jsonp({
+                'status': 'error',
+                'messageId': 400,
+                'message': error.details[0].message,
+            });
         }
         value.name = globalModules.firstLetterCapital(value.name);
-        value.companyCode = globalModules.generateCode(4)
+        // Generate a company code with length 4
         const companyExists = await Utils.CompanyExists(value);
         if (companyExists) {
-            return res.status(400).json({ status: 'error', message: 'company with this details already exists.' });
+            return res.jsonp({
+                'status': 'error',
+                'messageId': 400,
+                'message': 'Company with these details already exists.',
+            });
         }
+        // Create a new CompanyObj instance with the validated data
         const newCompany = new CompanyObj(value);
         const savedCompany = await newCompany.save();
-
-        res.json({ status: "success", data: savedCompany });
+        // Return a success response with the saved company data
+        return res.jsonp({
+            'status': 'success',
+            'messageId': 200,
+            'message': constantObj.messages.SuccessRetrievingData,
+            'data': savedCompany,
+        });
     } catch (error) {
-        res
-            .status(500)
-            .json({ status: "error", message: "Error saving Comapny data." });
+        return res.jsonp({
+            'status': 'error',
+            'messageId': 500,
+            'message': error.message,
+        });
     }
-
 };
 exports.updateCompany = async (req, res) => {
     try {
-        const { error, value } = Utils.ComapnyValidate(req.body);
-        if (error) {
-            return res.status(400).json({ status: 'error', message: error.details[0].message });
-        }
-        value.name = globalModules.firstLetterCapital(value.name);
-
-        const companyExists = await Utils.CompanyExists(value);
-
+        const {name,id } = req.body;
+     if(name){
+        name = globalModules.firstLetterCapital(name);
+     }
+     
+        const companyExists = await ComapanyObj.findOne({_id:id});
         if (!companyExists) {
-            return res.status(404).json({ status: 'error', message: 'Company not found.' });
+            return res.jsonp({
+                'status': 'error',
+                'messageId': 400,
+                'message': 'Company does not exist.',
+            });
         }
         companyExists.set(req.body);
-        await companyExists.save();
-
-        res.json({ status: 'success', message: 'company updated successfully' })
+        const savedCompany = await companyExists.save();
+        return res.jsonp({
+            'status': 'success',
+            'messageId': 200,
+            'message': constantObj.messages.SuccessRetrievingData,
+            'data': savedCompany,
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error updating Company data.' });
+        return res.jsonp({
+            'status': 'error',
+            'messageId': 500,
+            'message': error.message,
+        });
     }
-
-}
+};
 exports.getCompany = async (req, res) => {
     try {
         const { id } = req.params;
-        const company = await ComapanyObj.findOne({ _id:id });
-
+        const company = await ComapanyObj.findOne({ _id: id });
         if (!company) {
-            return res.status(404).json({ status: 'error', message: 'Company not found.' });
+            return res.jsonp({
+                'status': 'error',
+                'messageId': 404,
+                'message': 'Company does not exist.',
+            });
         }
-
-        res.json({ status: 'success', data: company });
+        return res.jsonp({
+            'status': 'success',
+            'messageId': 200,
+            'message': constantObj.messages.SuccessRetrievingData,
+            'data': company,
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error fetching company.' });
+        return res.jsonp({
+            'status': 'error',
+            'messageId': 500,
+            'message': error.message,
+        });
     }
 };
 exports.getAllCompanies = async (req, res) => {
     try {
-        const companies = await ComapanyObj.find({ deleted: false });
+        const companies = await ComapanyObj.find({ isDeleted: false });
         const totalCount = await ComapanyObj.countDocuments();
-
-        res.json({ status: 'success', data: companies, totalCount });
+        return res.jsonp({
+            'status': 'success',
+            'messageId': 200,
+            'message': constantObj.messages.SuccessRetrievingData,
+            'data': companies,
+            'totalRecords': totalCount
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error fetching companies .' });
+        return res.jsonp({
+            'status': 'error',
+            'messageId': 500,
+            'message': error.message,
+        });
     }
 };
 exports.deleteCompany = async (req, res) => {
-    try{
-    const { id } = req.params;
-    const accountToSoftDelete = await ComapanyObj.findOne({ _id:id });
-
-    if (!companyToSoftDelete) {
-        return res.status(404).json({ status: 'error', message: 'Company not found.' });
+    try {
+        const { id } = req.params;
+        const companyToSoftDelete = await ComapanyObj.findOne({ _id: id });
+        if (!companyToSoftDelete) {
+            return res.jsonp({
+                'status': 'error',
+                'messageId': 404,
+                'message': 'Company does not exist.',
+            });
+        }
+        companyToSoftDelete.isDeleted = true;
+        companyToSoftDelete.deletedAt = new Date();
+        await companyToSoftDelete.save();
+        return res.jsonp({
+            'status': 'success',
+            'messageId': 200,
+            'message': constantObj.messages.RecordDeleted,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            'status': 'error',
+            'message': 'Error soft-deleting company.'
+        });
     }
-
-    // Mark the account as deleted
-    accountToSoftDelete.isDeleted = true;
-    accountToSoftDelete.deletedAt = new Date();
-    await accountToSoftDelete.save();
-
-    res.json({ status: 'success', message: 'Company soft-deleted successfully.' });
-} catch (error) {
-    res.status(500).json({ status: 'error', message: 'Error soft-deleting company.' });
-}
-}
+};
+exports.restoreCompany = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const companyToSoftDelete = await ComapanyObj.findOne({ _id: id });
+        if (!companyToSoftDelete) {
+            return res.jsonp({
+                'status': 'error',
+                'messageId': 404,
+                'message': 'Company does not exist.',
+            });
+        }
+        companyToSoftDelete.isDeleted = false;
+        companyToSoftDelete.deletedAt = new Date();
+        await companyToSoftDelete.save();
+        return res.jsonp({
+            'status': 'success',
+            'messageId': 200,
+            'message': "Comapny" + constantObj.messages.RestorSuccess,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            'status': 'error',
+            'message': 'Error soft-deleting company.'
+        });
+    }
+};
 exports.searchCompany = async (req, res) => {
     try {
         const { search } = req.query;
         const trimmedSearch = search ? search.trim() : '';
-
         let query = {};
-
         if (trimmedSearch) {
             query = {
                 $or: [
@@ -107,12 +184,18 @@ exports.searchCompany = async (req, res) => {
             };
         }
         const companies = await ComapanyObj.find(query);
-
         const totalCount = await ComapanyObj.countDocuments(query);
-
-        res.json({ status: 'success', data: companies, totalCount });
+        return res.jsonp({
+            'status': 'success',
+            'messageId': 200,
+            'message': constantObj.messages.SuccessRetrievingData,
+            'data': companies,
+            'totalRecords': totalCount
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error fetching company list.' });
+        res.status(500).json({
+            'status': 'error',
+            'message': 'Error fetching company list.'
+        });
     }
 };
-

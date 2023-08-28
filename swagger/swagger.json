@@ -268,13 +268,13 @@
       }
     },
    
-    "/api/v1/accounts": {
+    "/api/v1/admin-auth/add-admin": {
       "post": {
         "tags": [
-          "Accounts"
+          "Admin Auth"
         ],
-        "summary": "Create Account",
-        "description": "Endpoint for adding an new account",
+        "summary": "Add Admin",
+        "description": "Endpoint for adding an admin",
         "requestBody": {
           "required": true,
           "content": {
@@ -473,30 +473,30 @@
       }
     },
 
-    "/api/v1/assets/create": {
+    "/api/v1/accounts": {
       "post": {
         "tags": [
-          "Assets"
+          "Account"
         ],
-        "summary": "Create a new asset",
-        "description": "Create a new asset object",
+        "summary": "Create a new Account",
+        "description": "Create a new Account object",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AssetCreationRequest"
+                "$ref": "#/components/schemas/AccountCreationRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Success: Asset created successfully",
+            "description": "Success: Account created successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Create"
+                  "$ref": "#/components/schemas/AccountCreationResponse"
                 }
               }
             }
@@ -993,7 +993,17 @@
       }
     },
     "schemas": {
-      
+      "Error": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "security": [
