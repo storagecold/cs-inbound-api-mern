@@ -15,9 +15,17 @@ const CompanySchema = new Schema(
 
     industry: String,
     website: String,
-    address: Object,
+    address: {
+      city:String,
+      district:String,
+      state:String,
+      pinCode:String
+  },
     logo: Object,
     isDeleted: { type: Boolean, default: false },
+    deletedAt: { type: Date, default: null },
+    createdBy: { type: Schema.Types.ObjectId, ref: "User" },
+    updatedBy: { type: Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );

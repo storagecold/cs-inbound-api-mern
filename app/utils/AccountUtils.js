@@ -30,12 +30,18 @@ module.exports = {
             state: Joi.string(),
             pinCode: Joi.number().integer()
         });
-        const bankAccountSchema = Joi.string().pattern(/^[0-9a-fA-F]{24}$/);
+        const bankAccountSchema = Joi.object({
+            accNumber: Joi.number().required(),
+            accName: Joi.string().required(),
+            bankName: Joi.string().required(),
+            branchName: Joi.string().required(),
+            ifscCode: Joi.string().required(),
+          });
 
         const schema = Joi.object({
             company: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
             type: Joi.string().valid('kisan', 'staff', 'others'),
-            accountNumber: Joi.number().integer().required(),
+            accountNumber: Joi.number().integer(),
             firstName: Joi.string().allow(''),
             lastName: Joi.string().allow(''),
             careOf: Joi.string().valid('S/O', 'W/O', 'D/O'),
@@ -45,7 +51,7 @@ module.exports = {
             adharNo: Joi.number().integer().allow(null),
             panNO: Joi.string().allow(''),
             email: Joi.string().email().allow(''),
-            bankAccount: Joi.array().items(bankAccountSchema),
+            bankDetails: Joi.array().items(bankAccountSchema),
             isDeleted: Joi.boolean(),
             deletedAt: Joi.date().allow(null),
             createdBy: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).allow(null),

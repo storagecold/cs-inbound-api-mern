@@ -16,7 +16,10 @@ const OrganizationSchema = new Schema({
     },
     logo: Object,
     owner: [String],
-    isDeleted: { type: Boolean, default: false }
+    isDeleted: { type: Boolean, default: false },
+    deletedAt: { type: Date, default: null },
+    createdBy: { type: Schema.Types.ObjectId, ref: "User" },
+    updatedBy: { type: Schema.Types.ObjectId, ref: "User" },
 }, { timestamps: true });
 
 const OrganizationObj = mongoose.model('Organization', OrganizationSchema);

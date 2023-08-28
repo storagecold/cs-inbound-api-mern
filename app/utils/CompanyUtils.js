@@ -1,22 +1,24 @@
-const OrganizationObj = require('../models/Organization');
+const CompanyObj = require('../models/Company');
 const Joi = require('joi');
 
 module.exports = {
-    OrganizationExists: async function (value) {
+    CompanyExists: async function (value) {
         let query = {
             name: value.name,
             email:value.email,
+            companyCode:value.companyCode,
             "address.city": value.address.city
         }
-        return await OrganizationObj.findOne(query);
+        return await CompanyObj.findOne(query);
     },
-
-    OrganizationValidate: function (body) {
+    ComapnyValidate: function (body) {
         const schema = Joi.object({
+            companyCode: Joi.string().required(),
+            organization: Joi.string().required(), 
             name: Joi.string().required(),
             email: Joi.string().email().required(),
-            phone: Joi.string(),
-            mobile: Joi.string(),
+            phone: Joi.string().required(),
+          
             industry: Joi.string(),
             website: Joi.string(),
             address: Joi.object({
@@ -25,19 +27,12 @@ module.exports = {
               state: Joi.string(),
               pinCode: Joi.string()
             }),
-            logo: Joi.object({
-              originalName: Joi.string(),
-              location: Joi.string(),
-              key: Joi.string()
-            }),
-            owner: Joi.array().items(Joi.string()),
+            logo: Joi.object(),
             isDeleted: Joi.boolean(),
             deletedAt: Joi.date().allow(null),
             createdBy: Joi.string(),
             updatedBy: Joi.string() 
           });
-
-
         return schema.validate(body)
 
     }

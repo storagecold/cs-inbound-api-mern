@@ -1,5 +1,6 @@
 const AccountObj = require('../models/Account');
 const globalModules = require('../helpers/globalModules');
+const constantObj = require('../config/Constants')
 const Joi = require('joi');
 const Utils = require('../utils/AccountUtils')
 exports.createAccount = async (req, res) => {
@@ -10,21 +11,21 @@ exports.createAccount = async (req, res) => {
         }
         value.firstName = globalModules.firstLetterCapital(value.firstName);
         value.lastName = globalModules.firstLetterCapital(value.lastName);
-       const accountExists= await Utils.AccountExists(value,res);
+        const accountExists = await Utils.AccountExists(value, res);
         if (accountExists) {
             return res.status(400).json({ status: 'error', message: 'Account with this details already exists.' });
         }
-       await Utils.GetAccountNumber(value);
+        await Utils.GetAccountNumber(value);
         const newAccount = new AccountObj(value);
         const savedAccount = await newAccount.save();
 
-      res.json({ status: "success", data: savedAccount });
+        res.json({ status: "success", data: savedAccount });
     } catch (error) {
-      res
-        .status(500)
-        .json({ status: "error", message: "Error saving account data." });
+        res
+            .status(500)
+            .json({ status: "error", message: "Error saving account data." });
     }
-    
+
 };
 
 exports.updateAccount = async (req, res) => {
@@ -32,48 +33,83 @@ exports.updateAccount = async (req, res) => {
         if (req.body.firstName) {
             req.body.firstName = globalModules.firstLetterCapital(req.body.firstName);
         }
-        const { accountNumber } = req.body;
-        const existingAccount = await AccountObj.findOne({ accountNumber });
+        const { _id } = req.body;
+        const existingAccount = await AccountObj.findOne({ _id });
 
         if (!existingAccount) {
-            return res.status(404).json({ status: 'error', message: 'Account not found.' });
+            return res.jsonp({
+                status: "error",
+                messageId: 404,
+                message: `Account ${constantObj.messages.NotExists}`,
+            });
         }
         existingAccount.set(req.body);
         const updatedAccount = await existingAccount.save();
-
-        res.json({ status: 'success', data: updatedAccount });
+        return res.jsonp({
+            status: "success",
+            messageId: 200,
+            data: updatedAccount,
+            message: `Account ${constantObj.messages.RecordUpdated}`,
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error updating account data.' });
+        return res.jsonp(errorHandler(error.message));
     }
 };
 
 exports.deleteAccount = async (req, res) => {
     try {
-        const { accountNumber } = req.params;
-        const accountToSoftDelete = await AccountObj.findOne({ accountNumber });
+        const { _id } = req.params.id;
+        const accountToSoftDelete = await AccountObj.findOne({ _id });
 
         if (!accountToSoftDelete) {
-            return res.status(404).json({ status: 'error', message: 'Account not found.' });
+            return res.jsonp({
+                status: "error",
+                messageId: 404,
+                message: `Account ${constantObj.messages.NotExists}`,
+            });
         }
 
-        // Mark the account as deleted
         accountToSoftDelete.isDeleted = true;
         accountToSoftDelete.deletedAt = new Date();
-        await accountToSoftDelete.save();
+        const data = await accountToSoftDelete.save();
 
-        res.json({ status: 'success', message: 'Account soft-deleted successfully.' });
+        return res.jsonp({
+            status: "success",
+            message: "Account soft-deleted successfully.",
+            messageId: 200,
+            data: data,
+        });
+
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error soft-deleting account.' });
+        return res.jsonp({
+            status: "error",
+            message: "Error soft-deleting account.",
+            messageId: 500,
+        });
     }
 };
 
 exports.getAccountsList = async (req, res) => {
     try {
-        // Fetch non-deleted accounts
-        const accountsList = await AccountObj.find({ deleted: false });
-        const totalCount = await AccountObj.countDocuments();
+        let perPage = Number(req.params.perPage) || 10;
+        let page = Number(req.params.page) || 1;
+        const { companyId } = req.params;
 
-        res.json({ status: 'success', data: accountsList, totalCount });
+        let query = {
+            company: companyId,
+            isDeleted: false
+        }
+
+        const data = await AccountObj.find(query)
+        .populate('company', 'name')
+        .populate('createdBy', 'role email')
+        .populate('updatedBy', 'role email')
+        .skip((perPage * page) - perPage)
+        .limit(perPage)
+        .sort({ updatedAt: -1 });
+        const totalCount = await AccountObj.countDocuments(query);
+
+        res.json({ status: 'success', data, totalCount });
     } catch (error) {
         res.status(500).json({ status: 'error', message: 'Error fetching accounts list.' });
     }
