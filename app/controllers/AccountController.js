@@ -1,31 +1,66 @@
 const AccountObj = require('../models/Account');
 const globalModules = require('../helpers/globalModules');
-const constantObj = require('../config/Constants')
-const Joi = require('joi');
-const Utils = require('../utils/AccountUtils')
+const constantObj = require('../config/Constants');
+const Utils = require('../utils/AccountUtils');
+
+const STATUS_MESSAGES = {
+    success: 'success',
+    error: 'error',
+    accountNotFound: 'Account does not exist.',
+    accountExists: 'Account with these details already exists.',
+    saveSuccess: 'Account added successfully.',
+    saveError: 'Error saving Account data.',
+    updateSuccess: 'Account updated successfully.',
+    retrieveSuccess: 'Account retrieved successfully.',
+    updateError: 'Error updating Account data.',
+    fetchError: 'Error fetching Account.',
+    deleteError: 'Error deleting Account.',
+    deleteError: 'Error deleting Account.',
+    recordDeleted: 'Record deleted successfully.',
+    restoreSuccess: 'Account restored successfully.',
+    restoreError: 'Error restoring Account.',
+};
+
 exports.createAccount = async (req, res) => {
     try {
         const { error, value } = Utils.AccountValidate(req.body);
         if (error) {
-            return res.status(400).json({ status: 'error', message: error.details[0].message });
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: error.details[0].message
+            });
         }
         value.firstName = globalModules.firstLetterCapital(value.firstName);
         value.lastName = globalModules.firstLetterCapital(value.lastName);
+
         const accountExists = await Utils.AccountExists(value, res);
         if (accountExists) {
-            return res.status(400).json({ status: 'error', message: 'Account with this details already exists.' });
+            return res.json({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.accountExists,
+            });
         }
+
         await Utils.GetAccountNumber(value);
+
         const newAccount = new AccountObj(value);
         const savedAccount = await newAccount.save();
 
-        res.json({ status: "success", data: savedAccount });
+        return res.jsonp({
+            status: STATUS_MESSAGES.success,
+            messageId: 200,
+            message: STATUS_MESSAGES.saveSuccess,
+            data: savedAccount
+        });
     } catch (error) {
-        res
-            .status(500)
-            .json({ status: "error", message: "Error saving account data." });
+        return res.jsonp({
+            status: STATUS_MESSAGES.error,
+            messageId: 500,
+            message: STATUS_MESSAGES.saveError,
+        });
     }
-
 };
 
 exports.updateAccount = async (req, res) => {
@@ -33,39 +68,45 @@ exports.updateAccount = async (req, res) => {
         if (req.body.firstName) {
             req.body.firstName = globalModules.firstLetterCapital(req.body.firstName);
         }
-        const { _id } = req.body;
-        const existingAccount = await AccountObj.findOne({ _id });
+        const { accountNumber } = req.body;
+        const existingAccount = await AccountObj.findOne({ accountNumber });
 
         if (!existingAccount) {
             return res.jsonp({
-                status: "error",
+                status: STATUS_MESSAGES.error,
                 messageId: 404,
-                message: `Account ${constantObj.messages.NotExists}`,
+                message: STATUS_MESSAGES.accountNotFound,
             });
         }
+
         existingAccount.set(req.body);
         const updatedAccount = await existingAccount.save();
+
         return res.jsonp({
-            status: "success",
+            status: STATUS_MESSAGES.success,
             messageId: 200,
             data: updatedAccount,
-            message: `Account ${constantObj.messages.RecordUpdated}`,
+            message: STATUS_MESSAGES.updateSuccess,
         });
     } catch (error) {
-        return res.jsonp(errorHandler(error.message));
+        return res.jsonp({
+            status: STATUS_MESSAGES.success,
+            messageId: 500,
+            message: STATUS_MESSAGES.updateError,
+        });
     }
 };
 
 exports.deleteAccount = async (req, res) => {
     try {
-        const { _id } = req.params.id;
-        const accountToSoftDelete = await AccountObj.findOne({ _id });
+        const { accountNumber } = req.params;
+        const accountToSoftDelete = await AccountObj.findOne({ accountNumber ,isDeleted:false});
 
         if (!accountToSoftDelete) {
             return res.jsonp({
-                status: "error",
+                status: STATUS_MESSAGES.error,
                 messageId: 404,
-                message: `Account ${constantObj.messages.NotExists}`,
+                message: STATUS_MESSAGES.accountNotFound,
             });
         }
 
@@ -74,16 +115,47 @@ exports.deleteAccount = async (req, res) => {
         const data = await accountToSoftDelete.save();
 
         return res.jsonp({
-            status: "success",
-            message: "Account soft-deleted successfully.",
+            status: STATUS_MESSAGES.success,
             messageId: 200,
+            message: STATUS_MESSAGES.recordDeleted,
+        });
+
+    } catch (error) {
+        return res.jsonp({
+            status: STATUS_MESSAGES.error,
+            message: STATUS_MESSAGES.deleteError,
+            messageId: 500,
+        });
+    }
+};
+exports.restoreAccount = async (req, res) => {
+    try {
+        const { accountNumber } = req.params;
+        const accountToRestore = await AccountObj.findOne({ accountNumber ,isDeleted:true});
+
+        if (!accountToRestore) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 404,
+                message: STATUS_MESSAGES.accountNotFound,
+            });
+        }
+
+        accountToRestore.isDeleted = false;
+        accountToRestore.deletedAt = new Date();
+        const data = await accountToRestore.save();
+
+        return res.jsonp({
+            status: STATUS_MESSAGES.success,
+            messageId: 200,
+            message: STATUS_MESSAGES.restoreSuccess,
             data: data,
         });
 
     } catch (error) {
         return res.jsonp({
-            status: "error",
-            message: "Error soft-deleting account.",
+            status: STATUS_MESSAGES.error,
+            message: STATUS_MESSAGES.restoreError,
             messageId: 500,
         });
     }
@@ -101,17 +173,26 @@ exports.getAccountsList = async (req, res) => {
         }
 
         const data = await AccountObj.find(query)
-        .populate('company', 'name')
-        .populate('createdBy', 'role email')
-        .populate('updatedBy', 'role email')
-        .skip((perPage * page) - perPage)
-        .limit(perPage)
-        .sort({ updatedAt: -1 });
+            .populate('company', 'name')
+            .populate('createdBy', 'role email')
+            .populate('updatedBy', 'role email')
+            .skip((perPage * page) - perPage)
+            .limit(perPage)
+            .sort({ updatedAt: -1 });
         const totalCount = await AccountObj.countDocuments(query);
 
-        res.json({ status: 'success', data, totalCount });
+        return res.jsonp({
+            status: STATUS_MESSAGES.success,
+            messageId: 200,
+            data: data,
+            totalCount
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error fetching accounts list.' });
+        res.jsonp({
+            status: STATUS_MESSAGES.error,
+            messageId: 500,
+            message: STATUS_MESSAGES.fetchError
+        });
     }
 };
 
@@ -121,12 +202,25 @@ exports.getAccountByNumber = async (req, res) => {
         const account = await AccountObj.findOne({ accountNumber });
 
         if (!account) {
-            return res.status(404).json({ status: 'error', message: 'Account not found.' });
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 404,
+                message: STATUS_MESSAGES.accountNotFound
+            });
         }
 
-        res.json({ status: 'success', data: account });
+        return res.jsonp({
+            status: STATUS_MESSAGES.success,
+            messageId: 200,
+            message: STATUS_MESSAGES.retrieveSuccess,
+            data: account
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error fetching account.' });
+        res.jsonp({
+            status: STATUS_MESSAGES.success,
+            messageId: 500,
+            message: STATUS_MESSAGES.fetchError
+        });
     }
 };
 
@@ -148,16 +242,21 @@ exports.searchAccount = async (req, res) => {
             };
         }
 
-        // Fetch accounts based on the search query
         const accountsList = await AccountObj.find(query);
-
-        // Fetch the total count of matching records
         const totalCount = await AccountObj.countDocuments(query);
 
-        res.json({ status: 'success', data: accountsList, totalCount });
+        return res.jsonp({
+            status: STATUS_MESSAGES.success,
+            messageId: 200,
+            message: STATUS_MESSAGES.retrieveSuccess,
+            data: accountsList,
+            totalCount
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error fetching accounts list.' });
+        return res.json({
+            status: STATUS_MESSAGES.error,
+            messageId: 500,
+            message: STATUS_MESSAGES.fetchError
+        });
     }
 };
-
-
