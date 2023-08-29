@@ -11,7 +11,6 @@ exports.createAmad = async (req, res) => {
             return res.status(400).json({ status: 'error', message: 'Amad already exists.' });
         }
        await Utils.GetAmadNo(value);
-       console.log("value====>",value)
         const newAmad = new AmadObj(value);
         const savedAmad = await newAmad.save();
 
