@@ -4,11 +4,12 @@ const Schema = mongoose.Schema;
 const OrganizationSchema = new Schema({
     name: String,
     email: String,
-    phone: String,
-    mobile: String,
+    phone: Number,
+    mobile: Number,
     industry: String,
     website: String,
     address: {
+        addressLineOne:String,
         city:String,
         district:String,
         state:String,

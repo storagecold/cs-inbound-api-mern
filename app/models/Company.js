@@ -15,9 +15,11 @@ const CompanySchema = new mongoose.Schema(
     name: String,
     email: String,
     phone: String,
+    mobile:Number,
     industry: String,
     website: String,
     address: {
+      addressLineOne:String,
       city: String,
       district: String,
       state: String,

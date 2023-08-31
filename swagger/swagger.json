@@ -472,31 +472,118 @@
         }
       }
     },
-
-    "/api/v1/accounts": {
+ 
+    "/api/v1/organizations": {
       "post": {
         "tags": [
-          "Account"
+          "Organization"
         ],
-        "summary": "Create a new Account",
-        "description": "Create a new Account object",
+        "summary": "Create Organization ",
+        "description": "Add a new Organization to the system.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AccountCreationRequest"
+                "$ref": "#/components/schemas/OrganizationCreationRequest"
               }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "Success: Account created successfully",
+          "201": {
+            "description": "Organization created successfully.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AccountCreationResponse"
+                  "$ref": "#/components/schemas/OrganizationCreationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Organization"
+        ],
+        "summary": "Update Organization ",
+        "description": "Update a Organization to the system.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Organization updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationUpdateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Organization"
+        ],
+        "summary": "Get a Organizations",
+        "responses": {
+          "200": {
+            "description": "Organizations retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationsResponse"
                 }
               }
             }
@@ -524,23 +611,114 @@
         }
       }
     },
-    "/api/v1/assets/list/{companyId}/{page}/{perPage}": {
+
+    "/api/v1/companies": {
+      "post": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Create Company ",
+        "description": "Add a new Company to the system.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyCreationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Company created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyCreationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Update Company ",
+        "description": "Update a Company to the system.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Company updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyUpdateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/companies/{page}/{perPage}": {
       "get": {
         "tags": [
-          "Assets"
+          "Company"
         ],
-        "summary": "Get a list of assets",
-        "description": "Retrieve a paginated list of assets based on the companyId",
+        "summary": "Get a list of Companies",
         "parameters": [
-          {
-            "name": "companyId",
-            "in": "path",
-            "description": "The ID of the company to retrieve assets from.",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          },
           {
             "name": "page",
             "in": "path",
@@ -555,7 +733,7 @@
           {
             "name": "perPage",
             "in": "path",
-            "description": "The number of assets to display per page (e.g., 10, 25, 50, 100).",
+            "description": "The number of Company to display per page (e.g., 10, 25, 50, 100).",
             "schema": {
               "type": "integer",
               "format": "int64",
@@ -566,11 +744,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Success: Assets retrieved successfully",
+            "description": "Companies retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AssetListResponse"
+                  "$ref": "#/components/schemas/CompaniesListResponse"
                 }
               }
             }
@@ -598,168 +776,12 @@
         }
       }
     },
-    "/api/v1/assets/get/{assetId}": {
+    "/api/v1/companies/{companyId}": {
       "get": {
         "tags": [
-          "Assets"
+          "Company"
         ],
-        "summary": "Get asset by ID",
-        "description": "Retrieve an asset using its ID",
-        "parameters": [
-          {
-            "name": "assetId",
-            "in": "path",
-            "description": "The ID of the asset to retrieve.",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Asset retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AssetResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request: Invalid request parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error: Unexpected server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/assets/delete/{assetId}": {
-      "delete": {
-        "tags": [
-          "Assets"
-        ],
-        "summary": "Delete a asset by ID",
-        "description": "Delete a asset by its asset ID",
-        "parameters": [
-          {
-            "name": "assetId",
-            "in": "path",
-            "description": "ID of the asset to be deleted",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success: Driver deleted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Delete"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request: Invalid request parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error: Unexpected server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
- 
-    "/api/v1/customers/create": {
-      "post": {
-        "tags": [
-          "Customers"
-        ],
-        "summary": "Create Customer",
-        "description": "Add a new customer to the system.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CustomerCreationRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Customer created successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CustomerCreationResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request: Invalid request parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error: Unexpected server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/customers/list/{companyId}/{page}/{perPage}": {
-      "get": {
-        "tags": [
-          "Customers"
-        ],
-        "summary": "Get a list of Customers",
+        "summary": "Get Company by id",
         "parameters": [
           {
             "name": "companyId",
@@ -769,37 +791,15 @@
               "type": "string"
             },
             "required": true
-          },
-          {
-            "name": "page",
-            "in": "path",
-            "description": "The page number to retrieve (e.g., 1, 2, 3).",
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "minimum": 1
-            },
-            "required": true
-          },
-          {
-            "name": "perPage",
-            "in": "path",
-            "description": "The number of form cards to display per page (e.g., 10, 25, 50, 100).",
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "minimum": 1
-            },
-            "required": true
           }
         ],
         "responses": {
           "200": {
-            "description": "Form cards retrieved successfully",
+            "description": "compan retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CustomerList"
+                  "$ref": "#/components/schemas/CompanyResponse"
                 }
               }
             }
@@ -827,69 +827,18 @@
         }
       }
     },
-    "/api/v1/customers/get/{customerId}": {
-      "get": {
-        "tags": [
-          "Customers"
-        ],
-        "summary": "Get customer by id",
-        "parameters": [
-          {
-            "name": "customerId",
-            "in": "path",
-            "description": "The customerId to retrieve.",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Form cards retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CustomerCreationResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request: Invalid request parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error: Unexpected server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/customers/delete/{customerId}": {
+    "/api/v1/companies/delete/{companyId}": {
       "delete": {
         "tags": [
-          "Customers"
+          "Company"
         ],
-        "summary": "Delete a customer by ID",
-        "description": "Delete a customer by its customer ID",
+        "summary": "Delete a Company",
+        "description": "Delete a Company by its Company ID",
         "parameters": [
           {
-            "name": "customerId",
+            "name": "companyId",
             "in": "path",
-            "description": "ID of the customer to be deleted",
+            "description": "ID of the company to be deleted",
             "schema": {
               "type": "string"
             },
@@ -898,7 +847,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success: Customer deleted",
+            "description": "Success: company deleted",
             "content": {
               "application/json": {
                 "schema": {
@@ -930,31 +879,30 @@
         }
       }
     },
-
-    "/api/v1/form-cards/search": {
+    "/api/v1/companies/search": {
       "post": {
         "tags": [
-          "Form-Cards"
+          "Company"
         ],
-        "summary": "Search Form-Cards",
-        "description": "Search for Form-Card objects",
+        "summary": "Search Company",
+        "description": "Search for Company objects",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FormCard"
+                "$ref": "#/components/schemas/CompanySearchRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Success: Form-Cards found",
+            "description": "Success: Company found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FormCard"
+                  "$ref": "#/components/schemas/CompaniesListResponse"
                 }
               }
             }

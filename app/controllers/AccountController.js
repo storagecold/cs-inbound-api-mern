@@ -1,12 +1,13 @@
 const AccountObj = require('../models/Account');
 const globalModules = require('../helpers/globalModules');
-const constantObj = require('../config/Constants');
-const Utils = require('../utils/AccountUtils');
+const AccountUtils = require('../utils/AccountUtils');
+const CompanyUtils = require('../utils/CompanyUtils');
 
 const STATUS_MESSAGES = {
     success: 'success',
     error: 'error',
     accountNotFound: 'Account does not exist.',
+    companyNotFound: 'Account does not exist.',
     accountExists: 'Account with these details already exists.',
     saveSuccess: 'Account added successfully.',
     saveError: 'Error saving Account data.',
@@ -34,7 +35,20 @@ exports.createAccount = async (req, res) => {
         value.firstName = globalModules.firstLetterCapital(value.firstName);
         value.lastName = globalModules.firstLetterCapital(value.lastName);
 
-        const accountExists = await Utils.AccountExists(value, res);
+        const companyExists = await CompanyUtils.CompanyExists({_id:value.company});
+        if (!companyExists) {
+            return res.json({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.companyNotFound,
+            });
+        }
+        let query = {
+            firstName: value.firstName,
+            careOfName: value.careOfName,
+            "address.village": value.address.village
+        }
+        const accountExists = await AccountUtils.AccountExists(query, res);
         if (accountExists) {
             return res.json({
                 status: STATUS_MESSAGES.error,
@@ -43,7 +57,7 @@ exports.createAccount = async (req, res) => {
             });
         }
 
-        await Utils.GetAccountNumber(value);
+        await AccountUtils.GetAccountNumber(value);
 
         const newAccount = new AccountObj(value);
         const savedAccount = await newAccount.save();

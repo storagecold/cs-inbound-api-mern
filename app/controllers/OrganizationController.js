@@ -22,8 +22,12 @@ exports.createOrganization = async (req, res) => {
         }
         
         value.name = globalModules.firstLetterCapital(value.name);
-        
-        const organizationExists = await Utils.OrganizationExists(value, res);
+        let query = {
+            name: value.name,
+            email:value.email,
+            "address.city": value.address.city
+        }
+        const organizationExists = await Utils.OrganizationExists(query, res);
         if (organizationExists) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -31,6 +35,7 @@ exports.createOrganization = async (req, res) => {
                 message: STATUS_MESSAGES.organizationExists
             });
         }
+        value.mobile = '+91-' + value.mobile;
         
         const newOrganization = new OrganizationObj(value);
         const savedOrganization = await newOrganization.save();
