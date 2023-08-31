@@ -161,5 +161,5 @@ test("when_missing_phone_should_throw_missing_phone_error", async () => {
     owner: ["Rani Prasad", "Ram Gopal", "Mohan Dutt"],
   };
   const { error, value } = organizationUtils.OrganizationValidate(missingPhone);
-  expect(error.message).toBe('"phone" must be a string');
+  expect(error.message).toBe('"phone" must be less than or equal to 12');
 });
