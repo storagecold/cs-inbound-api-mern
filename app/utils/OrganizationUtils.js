@@ -2,35 +2,31 @@ const OrganizationObj = require('../models/Organization');
 const Joi = require('joi');
 
 module.exports = {
-    OrganizationExists: async function (value) {
-        let query = {
-            name: value.name,
-            email:value.email,
-            "address.city": value.address.city
-        }
+    OrganizationExists: async function (query) {
         return await OrganizationObj.findOne(query);
     },
 
     OrganizationValidate: function (body) {
         const schema = Joi.object({
-            name: Joi.string().required(),
+            name: Joi.string().max(30).required(),
             email: Joi.string().email().required(),
-            phone: Joi.string(),
-            mobile: Joi.string(),
-            industry: Joi.string(),
+            phone: Joi.number().max(12),
+            mobile: Joi.number().max(10).required(),
+            industry: Joi.string().max(15).required(),
             website: Joi.string(),
             address: Joi.object({
+              addressLineOne: Joi.string(),
               city: Joi.string(),
               district: Joi.string(),
               state: Joi.string(),
               pinCode: Joi.string()
-            }),
+            }).required(),
             logo: Joi.object({
               originalName: Joi.string(),
               location: Joi.string(),
               key: Joi.string()
             }),
-            owner: Joi.array().items(Joi.string()),
+            owner: Joi.array().items(Joi.string().required()),
             isDeleted: Joi.boolean(),
             deletedAt: Joi.date().allow(null),
             createdBy: Joi.string(),

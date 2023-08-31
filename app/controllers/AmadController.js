@@ -1,10 +1,22 @@
 const AmadObj = require('../models/Amad');
-const Utils = require('../utils/AmadUtils')
+const AmadUtils = require('../utils/AmadUtils')
+const AccountUtils = require('../utils/AccountUtils')
 exports.createAmad = async (req, res) => {
     try {
         const { error, value } = Utils.AmadValidate(req.body);
         if (error) {
             return res.status(400).json({ status: 'error', message: error.details[0].message });
+        }
+        const accountExists = await AccountUtils.AccountExists({_id: value.account});
+
+        if(!accountExists){
+            if (accountExists) {
+                return res.json({
+                    status: STATUS_MESSAGES.error,
+                    messageId: 400,
+                    message: STATUS_MESSAGES.accountExists,
+                });
+            }
         }
        const amadExists= await Utils.AmadExists(value,res);
         if (amadExists) {

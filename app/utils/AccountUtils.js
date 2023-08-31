@@ -3,12 +3,8 @@ const RunningNumberObj = require('../models/RunningNumbers');
 const Joi = require('joi');
 
 module.exports = {
-    AccountExists: async function (value) {
-        let query = {
-            firstName: value.firstName,
-            careOfName: value.careOfName,
-            "address.village": value.address.village
-        }
+    AccountExists: async function (query) {
+    
         return await AccountObj.findOne(query);
     },
 
@@ -24,6 +20,7 @@ module.exports = {
 
     AccountValidate: function (body) {
         const addressSchema = Joi.object({
+            addressLineOne: Joi.string(),
             village: Joi.string(),
             city: Joi.string(),
             district: Joi.string(),

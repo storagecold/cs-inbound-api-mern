@@ -3,10 +3,8 @@ const RunningNumberObj = require('../models/RunningNumbers');
 const Joi = require('joi');
 
 module.exports = {
-    AmadExists: async function (value) {
-        let query = {
-            amadNo: value.amadNo,
-        }
+    AmadExists: async function (query) {
+      
         return await AmadObj.findOne(query);
     },
 

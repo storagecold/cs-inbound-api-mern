@@ -1,7 +1,8 @@
 const CompanyObj = require('../models/Company');
 const globalModules = require('../helpers/globalModules');
-const Utils = require('../utils/CompanyUtils');
+const CompanyUtils = require('../utils/CompanyUtils');
 const ComapanyObj = require('../models/Company');
+const OrganizationUtils = require('../utils/OrganizationUtils');
 
 const STATUS_MESSAGES = {
     success: 'success',
@@ -17,12 +18,13 @@ const STATUS_MESSAGES = {
     recordDeleted: 'Record deleted successfully.',
     restoreSuccess: 'Company restored successfully.',
     restoreError: 'Error restoring Company.',
+    organizationNotFound: 'Organization does not exist.'
 };
 
 exports.createCompany = async (req, res) => {
     try {
         const { error, value } = Utils.ComapnyValidate(req.body);
-        
+
         if (error) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -32,8 +34,23 @@ exports.createCompany = async (req, res) => {
         }
 
         value.name = globalModules.firstLetterCapital(value.name);
-        
-        const companyExists = await Utils.CompanyExists(value);
+
+        const organizationExists = await OrganizationUtils.OrganizationExists({ _id: value.organization}, res);
+
+        if (!organizationExists) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.organizationNotFound
+            });
+        }
+        let query = {
+            name: value.name,
+            email: value.email,
+            companyCode: value.companyCode,
+            "address.city": value.address.city
+        }
+        const companyExists = await CompanyUtils.CompanyExists(query);
         if (companyExists) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -41,10 +58,10 @@ exports.createCompany = async (req, res) => {
                 message: STATUS_MESSAGES.companyExists,
             });
         }
-        
+        value.mobile = '+91-' + value.mobile
         const newCompany = new CompanyObj(value);
         const savedCompany = await newCompany.save();
-        
+
         return res.jsonp({
             status: STATUS_MESSAGES.success,
             messageId: 200,
@@ -96,7 +113,7 @@ exports.getCompany = async (req, res) => {
     try {
         const companyId = req.params.id;
         const company = await ComapanyObj.findOne({ _id: companyId });
-        
+
         if (!company) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -104,7 +121,7 @@ exports.getCompany = async (req, res) => {
                 message: STATUS_MESSAGES.companyNotFound,
             });
         }
-        
+
         return res.jsonp({
             status: STATUS_MESSAGES.success,
             messageId: 200,
@@ -122,9 +139,14 @@ exports.getCompany = async (req, res) => {
 
 exports.getAllCompanies = async (req, res) => {
     try {
-        const companies = await ComapanyObj.find({ isDeleted: false });
+        let perPage = Number(req.params.perPage) || 10;
+        let page = Number(req.params.page) || 1;
+        const companies = await ComapanyObj.find({ isDeleted: false })
+        .skip((perPage * page) - perPage)
+        .limit(perPage)
+        .populate('updatedBy')
         const totalCount = await ComapanyObj.countDocuments();
-        
+
         return res.jsonp({
             status: STATUS_MESSAGES.success,
             messageId: 200,
@@ -145,7 +167,7 @@ exports.deleteCompany = async (req, res) => {
     try {
         const { id } = req.params;
         const companyToSoftDelete = await ComapanyObj.findOne({ _id: id });
-        
+
         if (!companyToSoftDelete) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -153,11 +175,11 @@ exports.deleteCompany = async (req, res) => {
                 message: STATUS_MESSAGES.companyNotFound,
             });
         }
-        
+
         companyToSoftDelete.isDeleted = true;
         companyToSoftDelete.deletedAt = new Date();
         await companyToSoftDelete.save();
-        
+
         return res.jsonp({
             status: STATUS_MESSAGES.success,
             messageId: 200,
@@ -176,7 +198,7 @@ exports.restoreCompany = async (req, res) => {
     try {
         const companyId = req.params;
         const companyToSoftDelete = await ComapanyObj.findOne({ _id: companyId });
-        
+
         if (!companyToSoftDelete) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -184,11 +206,11 @@ exports.restoreCompany = async (req, res) => {
                 message: STATUS_MESSAGES.companyNotFound
             });
         }
-        
+
         companyToSoftDelete.isDeleted = false;
         companyToSoftDelete.deletedAt = new Date();
         await companyToSoftDelete.save();
-        
+
         return res.jsonp({
             status: STATUS_MESSAGES.success,
             messageId: 200,
@@ -208,7 +230,7 @@ exports.searchCompany = async (req, res) => {
         const { search } = req.query;
         const trimmedSearch = search ? search.trim() : '';
         let query = {};
-        
+
         if (trimmedSearch) {
             query = {
                 $or: [
@@ -217,10 +239,10 @@ exports.searchCompany = async (req, res) => {
                 ]
             };
         }
-        
+
         const companies = await ComapanyObj.find(query);
         const totalCount = await ComapanyObj.countDocuments(query);
-        
+
         return res.jsonp({
             status: STATUS_MESSAGES.success,
             messageId: 200,
