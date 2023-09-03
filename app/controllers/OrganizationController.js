@@ -1,5 +1,6 @@
-const OrganizationObj = require('../models/Organization');
+const organizationObj = require('../models/Organization');
 const globalModules = require('../helpers/globalModules');
+const adminUtils = require('../utils/AdminUtils')
 const Utils = require('../utils/OrganizationUtils');
 
 const STATUS_MESSAGES = {
@@ -11,7 +12,9 @@ const STATUS_MESSAGES = {
     updateSuccess: 'Organization updated successfully',
     retrieveSuccess: 'Organization updated successfully',
     updateError: 'Error updating Organization data.',
-    fetchError: 'Error fetching Organization.'
+    fetchError: 'Error fetching Organization.',
+    userNotAuthorized:'Only Admin is authorized to Create Organozation',
+    userNotAuthorizedUpdate:'Only Admin is authorized to update Organozation'
 };
 
 exports.createOrganization = async (req, res) => {
@@ -20,12 +23,19 @@ exports.createOrganization = async (req, res) => {
         if (error) {
             return res.status(400).json({ status: STATUS_MESSAGES.error, message: error.details[0].message });
         }
-        
+        const admin = await adminUtils.isAdmin({ _id: value.createdBy, role: 'admin' })
+        if (!admin) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.userNotAuthorized
+            });
+        }
         value.name = globalModules.firstLetterCapital(value.name);
         let query = {
             name: value.name,
-            email:value.email,
-            "address.city": value.address.city
+            email: value.email,
+            "address.cityVillage": value.address.cityVillage
         }
         const organizationExists = await Utils.OrganizationExists(query, res);
         if (organizationExists) {
@@ -36,10 +46,10 @@ exports.createOrganization = async (req, res) => {
             });
         }
         value.mobile = '+91-' + value.mobile;
-        
-        const newOrganization = new OrganizationObj(value);
+
+        const newOrganization = new organizationObj(value);
         const savedOrganization = await newOrganization.save();
-        
+
         return res.jsonp({
             status: STATUS_MESSAGES.success,
             messageId: 200,
@@ -56,13 +66,21 @@ exports.createOrganization = async (req, res) => {
 
 exports.updateOrganization = async (req, res) => {
     try {
-        const organizationId = req.body.id; 
-        
+        const organizationId = req.body.id;
+
+        const admin = await adminUtils.isAdmin({ _id: req.body.updatedBy, role: 'admin' })
+        if (!admin) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.userNotAuthorizedUpdate
+            });
+        }
         if (req.body.name) {
             req.body.name = globalModules.firstLetterCapital(req.body.name);
         }
-        
-        const existingOrganization = await OrganizationObj.findById(organizationId);
+
+        const existingOrganization = await organizationObj.findById(organizationId);
         if (!existingOrganization) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -70,10 +88,10 @@ exports.updateOrganization = async (req, res) => {
                 message: STATUS_MESSAGES.organizationNotFound
             });
         }
-        
+
         existingOrganization.set(req.body);
         const updatedOrganization = await existingOrganization.save();
-        
+
         return res.jsonp({
             status: STATUS_MESSAGES.success,
             messageId: 200,
@@ -90,9 +108,10 @@ exports.updateOrganization = async (req, res) => {
 };
 exports.getOrganization = async (req, res) => {
     try {
-        const organization = await OrganizationObj.find();
-        return res.jsonp({ status: STATUS_MESSAGES.success, messageId: 200, message:STATUS_MESSAGES.retrieveSuccess, data: organization });
+        const organization = await organizationObj.find();
+        return res.jsonp({ status: STATUS_MESSAGES.success, messageId: 200, message: STATUS_MESSAGES.retrieveSuccess, data: organization });
     } catch (error) {
         res.status(500).json({ status: STATUS_MESSAGES.error, message: STATUS_MESSAGES.fetchError });
     }
 };
+
