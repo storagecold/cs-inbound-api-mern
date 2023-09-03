@@ -38,17 +38,19 @@ const { swaggerServe, swaggerSetup } = require("./swagger/swaggerConfig");
 // swagger
 app.use("/api/v1/swagger-ui", swaggerServe, swaggerSetup);
 
-const userAuthRoutes = require("./app/routes/UserRoute");
+const userAuthRoutes = require("./app/routes/UserRoutes");
 const organizationRoutes = require("./app/routes/OrganizationRoutes");
-const companyRoutes = require("./app/routes/CompanyRoute");
-const accountRoutes = require("./app/routes/AccountRoute");
-const amadRoutes = require("./app/routes/AmadRoute");
+const companyRoutes = require("./app/routes/CompanyRoutes");
+const accountRoutes = require("./app/routes/AccountRoutes");
+const amadRoutes = require("./app/routes/AmadRoutes");
+const addressRoutes = require("./app/routes/AddressRoutes");
 
 app.use("/api/v1/", userAuthRoutes);
 app.use("/api/v1/", organizationRoutes);
 app.use("/api/v1/", companyRoutes);
 app.use("/api/v1", accountRoutes);
 app.use("/api/v1", amadRoutes);
+app.use("/api/v1", addressRoutes);
 
 const server = http.listen(process.env.PORT, function () {
   console.log(chalk.green("✓"), " App is running at", process.env.PORT);
