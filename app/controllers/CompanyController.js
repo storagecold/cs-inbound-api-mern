@@ -50,6 +50,7 @@ exports.createCompany = async (req, res) => {
             companyCode: value.companyCode,
             "address.city": value.address.city
         }
+        
         const companyExists = await CompanyUtils.CompanyExists(query);
         if (companyExists) {
             return res.jsonp({
