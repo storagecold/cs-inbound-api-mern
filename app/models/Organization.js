@@ -4,13 +4,13 @@ const Schema = mongoose.Schema;
 const OrganizationSchema = new Schema({
     name: String,
     email: String,
-    phone: Number,
-    mobile: Number,
+    phone: String,
+    mobile: String,
     industry: String,
     website: String,
     address: {
-        addressLineOne:String,
-        city:String,
+        addressLine1:String,
+        village:String,
         district:String,
         state:String,
         pinCode:String

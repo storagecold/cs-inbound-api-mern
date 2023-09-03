@@ -21,9 +21,8 @@ const AccountSchema = new Schema({
   },
   careOfName: String,
   address: {
-    addressLineOne:String,
+    addressLine1:String,
     village: String,
-    city: String,
     distict: String,
     state: String,
     pinCode: Number

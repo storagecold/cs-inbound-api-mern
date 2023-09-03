@@ -25,7 +25,7 @@ module.exports = {
 
     AmadValidate: function (body) {
         const schema = Joi.object({
-            // company: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
+            company: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
             account: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
             packets: Joi.number().integer().required(),
             kism: Joi.array().items(Joi.string()),
