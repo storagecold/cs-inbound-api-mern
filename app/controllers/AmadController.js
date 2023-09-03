@@ -18,11 +18,11 @@ exports.createAmad = async (req, res) => {
                 });
             }
         }
-       const amadExists= await Utils.AmadExists(value,res);
+       const amadExists= await AmadUtils.AmadExists(value,res);
         if (amadExists) {
             return res.status(400).json({ status: 'error', message: 'Amad already exists.' });
         }
-       await Utils.GetAmadNo(value);
+       await AmadUtils.GetAmadNo(value);
         const newAmad = new AmadObj(value);
         const savedAmad = await newAmad.save();
 
