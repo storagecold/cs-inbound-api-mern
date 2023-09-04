@@ -12,9 +12,9 @@ beforeEach(() => {
     industry: "ColdStaorage",
     website: "https://www.abccorp.com",
     address: {
-      city: "Shikohabad",
+      cityVillage: "Shikohabad",
       district: "Firocabad",
-      state: "UP",
+      state: "Uttar Pradesh",
       pinCode: "205145",
     },
     logo: {
@@ -41,6 +41,15 @@ test("when_pass_valid_query_return_valid_response", async () => {
   expect(orgResp).toStrictEqual(org);
 });
 
+test("Test for valid organization data", async () => {
+  // Arrange
+  // Act
+  const { error, value } = organizationUtils.OrganizationValidate(org);
+  // Assert
+  expect(error).toBeUndefined();
+  expect(value).toStrictEqual(org);
+});
+
 test("Validation Error for Missing Name", async () => {
   // Arrange
   delete org.name;
@@ -53,12 +62,12 @@ test("Validation Error for Missing Name", async () => {
 
 test("Validation Error for invalid Name", async () => {
   // Arrange
-  org.name = "qwertyuioplkjhf";
+  org.name = "qw ";
   // Act
   const { error, value } = organizationUtils.OrganizationValidate(org);
   // Assert
   expect(error).toBeDefined();
-  expect(error.message).toBe('"name" is required');
+  expect(error.message).toBe('"name" length must be at least 3 characters long');
 });
 
 test("Validation Error for Invalid Email", async () => {
@@ -87,7 +96,7 @@ test("Validation Error for Missing Email", async () => {
 
 test("Validation Error for Invalid Phone", async () => {
   // Arrange
-  org.phone = "1234567890988";
+  org.phone = "(02299) 12875678";
 
   // Act
   const { error, value } = organizationUtils.OrganizationValidate(org);
