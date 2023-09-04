@@ -1,8 +1,8 @@
 const CompanyObj = require('../models/Company');
 const globalModules = require('../helpers/globalModules');
 const CompanyUtils = require('../utils/CompanyUtils');
-const ComapanyObj = require('../models/Company');
 const OrganizationUtils = require('../utils/OrganizationUtils');
+const adminUtils = require('../utils/AdminUtils')
 
 const STATUS_MESSAGES = {
     success: 'success',
@@ -18,12 +18,16 @@ const STATUS_MESSAGES = {
     recordDeleted: 'Record deleted successfully.',
     restoreSuccess: 'Company restored successfully.',
     restoreError: 'Error restoring Company.',
-    organizationNotFound: 'Organization does not exist.'
+    organizationNotFound: 'Organization does not exist.',
+    userNotAuthorized: 'Only Admin is authorized to Create company',
+    userNotAuthorizedUpdate: 'Only Admin is authorized to update company',
+    userNotAuthorizedDelete: 'Only Admin is authorized to delete company',
+    userNotAuthorizedRestore: 'Only Admin is authorized to restore company'
 };
 
 exports.createCompany = async (req, res) => {
     try {
-        const { error, value } = Utils.ComapnyValidate(req.body);
+        const { error, value } = CompanyUtils.ComapnyValidate(req.body);
 
         if (error) {
             return res.jsonp({
@@ -32,10 +36,18 @@ exports.createCompany = async (req, res) => {
                 message: error.details[0].message,
             });
         }
+        const admin = await adminUtils.isAdmin({ _id: value.createdBy, role: 'admin' })
+        if (!admin) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.userNotAuthorized
+            });
+        }
 
         value.name = globalModules.firstLetterCapital(value.name);
 
-        const organizationExists = await OrganizationUtils.OrganizationExists({ _id: value.organization}, res);
+        const organizationExists = await OrganizationUtils.OrganizationExists({ _id: value.organization }, res);
 
         if (!organizationExists) {
             return res.jsonp({
@@ -48,7 +60,7 @@ exports.createCompany = async (req, res) => {
             name: value.name,
             email: value.email,
             companyCode: value.companyCode,
-            "address.city": value.address.city
+            "address.cityVillage": value.address.cityVillage
         }
         const companyExists = await CompanyUtils.CompanyExists(query);
         if (companyExists) {
@@ -79,12 +91,22 @@ exports.createCompany = async (req, res) => {
 
 exports.updateCompany = async (req, res) => {
     try {
-        let { name, id } = req.body;
+        let { name, id, updatedBy } = req.body;
+
+        const admin = await adminUtils.isAdmin({ _id: updatedBy, role: 'admin' })
+        if (!admin) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.userNotAuthorizedUpdate
+            });
+        }
+
         if (name) {
             name = globalModules.firstLetterCapital(name);
         }
 
-        const companyExists = await ComapanyObj.findOne({ _id: id });
+        const companyExists = await CompanyObj.findOne({ _id: id });
         if (!companyExists) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -99,7 +121,7 @@ exports.updateCompany = async (req, res) => {
             messageId: 200,
             message: STATUS_MESSAGES.updateSuccess,
             data: savedCompany,
-        });
+        })
     } catch (error) {
         return res.jsonp({
             status: STATUS_MESSAGES.error,
@@ -112,7 +134,7 @@ exports.updateCompany = async (req, res) => {
 exports.getCompany = async (req, res) => {
     try {
         const companyId = req.params.id;
-        const company = await ComapanyObj.findOne({ _id: companyId });
+        const company = await CompanyObj.findOne({ _id: companyId });
 
         if (!company) {
             return res.jsonp({
@@ -141,11 +163,11 @@ exports.getAllCompanies = async (req, res) => {
     try {
         let perPage = Number(req.params.perPage) || 10;
         let page = Number(req.params.page) || 1;
-        const companies = await ComapanyObj.find({ isDeleted: false })
-        .skip((perPage * page) - perPage)
-        .limit(perPage)
-        .populate('updatedBy')
-        const totalCount = await ComapanyObj.countDocuments();
+        const companies = await CompanyObj.find({ isDeleted: false })
+            .skip((perPage * page) - perPage)
+            .limit(perPage)
+            .populate('updatedBy')
+        const totalCount = await CompanyObj.countDocuments();
 
         return res.jsonp({
             status: STATUS_MESSAGES.success,
@@ -165,8 +187,18 @@ exports.getAllCompanies = async (req, res) => {
 
 exports.deleteCompany = async (req, res) => {
     try {
-        const { id } = req.params;
-        const companyToSoftDelete = await ComapanyObj.findOne({ _id: id });
+        const { updatedBy, id } = req.body;
+
+        const admin = await adminUtils.isAdmin({ _id: updatedBy, role: 'admin' })
+        if (!admin) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.userNotAuthorizedDelete
+            });
+        }
+
+        const companyToSoftDelete = await CompanyObj.findOne({ _id: id });
 
         if (!companyToSoftDelete) {
             return res.jsonp({
@@ -196,8 +228,17 @@ exports.deleteCompany = async (req, res) => {
 
 exports.restoreCompany = async (req, res) => {
     try {
-        const companyId = req.params;
-        const companyToSoftDelete = await ComapanyObj.findOne({ _id: companyId });
+        const { updatedBy, _id } = req.body;
+
+        const admin = await adminUtils.isAdmin({ _id: updatedBy, role: 'admin' })
+        if (!admin) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.userNotAuthorizedRestore
+            });
+        }
+        const companyToSoftDelete = await CompanyObj.findOne({ _id });
 
         if (!companyToSoftDelete) {
             return res.jsonp({
@@ -240,8 +281,8 @@ exports.searchCompany = async (req, res) => {
             };
         }
 
-        const companies = await ComapanyObj.find(query);
-        const totalCount = await ComapanyObj.countDocuments(query);
+        const companies = await CompanyObj.find(query);
+        const totalCount = await CompanyObj.countDocuments(query);
 
         return res.jsonp({
             status: STATUS_MESSAGES.success,

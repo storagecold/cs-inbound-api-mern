@@ -12,6 +12,13 @@ const CompanySchema = new mongoose.Schema(
       ref: "Organization",
       index: true,
     },
+    chamberNo: [{
+      type: Number,
+      required: true,
+      index: true,
+      default: 1,
+      enum: [1, 2, 3, 4]
+    }],
     name: String,
     email: String,
     phone: String,

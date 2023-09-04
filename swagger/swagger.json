@@ -267,7 +267,6 @@
         }
       }
     },
-   
     "/api/v1/admin-auth/add-admin": {
       "post": {
         "tags": [
@@ -472,7 +471,6 @@
         }
       }
     },
- 
     "/api/v1/organizations": {
       "post": {
         "tags": [
@@ -611,7 +609,6 @@
         }
       }
     },
-
     "/api/v1/companies": {
       "post": {
         "tags": [
@@ -705,6 +702,104 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Restore a Company",
+        "description": "Restore a Company by its Company ID",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyRestoreRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success: company restored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyRestoreResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Delete a Company",
+        "description": "Delete a Company by its Company ID",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyRestoreRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success: company deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyRestoreResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -827,58 +922,6 @@
         }
       }
     },
-    "/api/v1/companies/delete/{companyId}": {
-      "delete": {
-        "tags": [
-          "Company"
-        ],
-        "summary": "Delete a Company",
-        "description": "Delete a Company by its Company ID",
-        "parameters": [
-          {
-            "name": "companyId",
-            "in": "path",
-            "description": "ID of the company to be deleted",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success: company deleted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Delete"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request: Invalid request parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error: Unexpected server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/companies/search": {
       "post": {
         "tags": [
@@ -929,8 +972,332 @@
           }
         }
       }
+    },
+    "/api/v1/addresses": {
+      "post": {
+        "tags": [
+          "Address"
+        ],
+        "summary": "Add new Address ",
+        "description": "Add a new Address to the system.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressCreationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Address created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressCreationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Address"
+        ],
+        "summary": "Update Address ",
+        "description": "Address a Organization to the system.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Address updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressUpdateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Address"
+        ],
+        "summary": "Get a Addresses",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressDeleteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Addresses retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressDeleteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/addresses/{id}": {
+      "get": {
+        "tags": [
+          "Address"
+        ],
+        "summary": "Get Address by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id to retrieve.",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Address retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/addresses/{companyId}/{page}/{perPage}": {
+      "get": {
+        "tags": [
+          "Address"
+        ],
+        "summary": "Get a list of Addresses",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "description": "The page companyId to retrieve addresses",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            },
+            "required": true
+          },
+          {
+            "name": "page",
+            "in": "path",
+            "description": "The page number to retrieve (e.g., 1, 2, 3).",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            },
+            "required": true
+          },
+          {
+            "name": "perPage",
+            "in": "path",
+            "description": "The number of Address to display per page (e.g., 10, 25, 50, 100).",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Address retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/addresses/search": {
+      "post": {
+        "tags": [
+          "Address"
+        ],
+        "summary": "Search Address",
+        "description": "Search for Address objects",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressSearchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success: Company found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
-    
   },
   "components": {
     "securitySchemes": {
@@ -951,7 +1318,1529 @@
             "type": "string"
           }
         }
+      },
+      "OrganizationCreationRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "mobile": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "industry": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string",
+            "format": "uri"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "cityVillage": {
+                "type": "string"
+              },
+              "district": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "pinCode": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "addressLine1",
+              "cityVillage",
+              "district",
+              "state",
+              "pinCode"
+            ]
+          },
+          "logo": {
+            "type": "object",
+            "properties": {
+              "originalName": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string",
+                "format": "uri"
+              },
+              "key": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "originalName",
+              "location",
+              "key"
+            ]
+          },
+          "owner": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdBy": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "phone",
+          "mobile",
+          "industry",
+          "website",
+          "address",
+          "logo",
+          "owner",
+          "createdBy"
+        ]
+      },
+      "OrganizationCreationResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "success"
+            ]
+          },
+          "messageId": {
+            "type": "integer",
+            "minimum": 200
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "phone": {
+                "type": "string",
+                "pattern": "^[0-9]+$"
+              },
+              "mobile": {
+                "type": "string",
+                "pattern": "^[+]?[0-9]+([-]?[0-9]+)*$"
+              },
+              "industry": {
+                "type": "string"
+              },
+              "website": {
+                "type": "string",
+                "format": "uri"
+              },
+              "address": {
+                "type": "object",
+                "properties": {
+                  "addressLine1": {
+                    "type": "string"
+                  },
+                  "addressLine2": {
+                    "type": "string"
+                  },
+                  "cityVillage": {
+                    "type": "string"
+                  },
+                  "district": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "pinCode": {
+                    "type": "string",
+                    "pattern": "^[0-9]{6}$"
+                  }
+                },
+                "required": [
+                  "addressLine1",
+                  "cityVillage",
+                  "district",
+                  "state",
+                  "pinCode"
+                ]
+              },
+              "logo": {
+                "type": "object",
+                "properties": {
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "location": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "key": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "originalName",
+                  "location",
+                  "key"
+                ]
+              },
+              "owner": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "isDeleted": {
+                "type": "boolean"
+              },
+              "deletedAt": {
+                "type": [
+                  "null",
+                  "string"
+                ],
+                "format": "date-time"
+              },
+              "createdBy": {
+                "type": "string"
+              },
+              "_id": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "__v": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "name",
+              "email",
+              "phone",
+              "mobile",
+              "industry",
+              "website",
+              "address",
+              "logo",
+              "owner",
+              "isDeleted",
+              "createdBy",
+              "_id",
+              "createdAt",
+              "updatedAt",
+              "__v"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "messageId",
+          "data"
+        ]
+      },
+      "OrganizationUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "mobile": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "industry": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string",
+            "format": "uri"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "cityVillage": {
+                "type": "string"
+              },
+              "district": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "pinCode": {
+                "type": "integer"
+              }
+            }
+          },
+          "logo": {
+            "type": "object",
+            "properties": {
+              "originalName": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string",
+                "format": "uri"
+              },
+              "key": {
+                "type": "string"
+              }
+            }
+          },
+          "owner": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "updatedBy": {
+            "type": "string"
+          }
+        }
+      },
+      "OrganizationUpdateResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "success"
+            ]
+          },
+          "messageId": {
+            "type": "integer",
+            "minimum": 200
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "phone": {
+                "type": "string",
+                "pattern": "^[0-9]+$"
+              },
+              "mobile": {
+                "type": "string",
+                "pattern": "^[+]?[0-9]+([-]?[0-9]+)*$"
+              },
+              "industry": {
+                "type": "string"
+              },
+              "website": {
+                "type": "string",
+                "format": "uri"
+              },
+              "address": {
+                "type": "object",
+                "properties": {
+                  "addressLine1": {
+                    "type": "string"
+                  },
+                  "addressLine2": {
+                    "type": "string"
+                  },
+                  "cityVillage": {
+                    "type": "string"
+                  },
+                  "district": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "pinCode": {
+                    "type": "string",
+                    "pattern": "^[0-9]{6}$"
+                  }
+                },
+                "required": [
+                  "addressLine1",
+                  "cityVillage",
+                  "district",
+                  "state",
+                  "pinCode"
+                ]
+              },
+              "logo": {
+                "type": "object",
+                "properties": {
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "location": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "key": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "originalName",
+                  "location",
+                  "key"
+                ]
+              },
+              "owner": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "isDeleted": {
+                "type": "boolean"
+              },
+              "deletedAt": {
+                "type": [
+                  "null",
+                  "string"
+                ],
+                "format": "date-time"
+              },
+              "createdBy": {
+                "type": "string"
+              },
+              "updatedBy": {
+                "type": "string"
+              },
+              "_id": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "__v": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "name",
+              "email",
+              "phone",
+              "mobile",
+              "industry",
+              "website",
+              "address",
+              "logo",
+              "owner",
+              "isDeleted",
+              "createdBy",
+              "updatedBy",
+              "_id",
+              "createdAt",
+              "updatedAt",
+              "__v"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "messageId",
+          "message",
+          "data"
+        ]
+      },
+      "OrganizationsResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "success"
+            ]
+          },
+          "messageId": {
+            "type": "integer",
+            "minimum": 200
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "address": {
+                  "type": "object",
+                  "properties": {
+                    "addressLine1": {
+                      "type": "string"
+                    },
+                    "addressLine2": {
+                      "type": "string"
+                    },
+                    "cityVillage": {
+                      "type": "string"
+                    },
+                    "district": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "type": "string"
+                    },
+                    "pinCode": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "addressLine1",
+                    "cityVillage",
+                    "district",
+                    "state",
+                    "pinCode"
+                  ]
+                },
+                "_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "phone": {
+                  "type": "string",
+                  "pattern": "^[0-9]+$"
+                },
+                "mobile": {
+                  "type": "string",
+                  "pattern": "^[+]?[0-9]+([-]?[0-9]+)*$"
+                },
+                "industry": {
+                  "type": "string"
+                },
+                "website": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "logo": {
+                  "type": "object",
+                  "properties": {
+                    "originalName": {
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "key": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "originalName",
+                    "location",
+                    "key"
+                  ]
+                },
+                "owner": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "isDeleted": {
+                  "type": "boolean"
+                },
+                "deletedAt": {
+                  "type": [
+                    "null",
+                    "string"
+                  ],
+                  "format": "date-time"
+                },
+                "createdBy": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "__v": {
+                  "type": "integer"
+                },
+                "updatedBy": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "address",
+                "_id",
+                "name",
+                "email",
+                "phone",
+                "mobile",
+                "industry",
+                "website",
+                "logo",
+                "owner",
+                "isDeleted",
+                "createdBy",
+                "createdAt",
+                "updatedAt",
+                "__v",
+                "updatedBy"
+              ]
+            }
+          }
+        },
+        "required": [
+          "status",
+          "messageId",
+          "message",
+          "data"
+        ]
+      },
+      "CompanyCreationRequest": {
+        "type": "object",
+        "properties": {
+          "organization": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "chamberNo": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "companyCode": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^[0-9]{10}$"
+          },
+          "mobile": {
+            "type": "string",
+            "pattern": "^[0-9]{10}$"
+          },
+          "industry": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string",
+            "format": "uri"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "cityVillage": {
+                "type": "string"
+              },
+              "district": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "pinCode": {
+                "type": "string",
+                "pattern": "^[0-9]{5}$"
+              }
+            },
+            "required": [
+              "addressLine1",
+              "cityVillage",
+              "district",
+              "state",
+              "pinCode"
+            ]
+          },
+          "logo": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "altText": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "url",
+              "altText"
+            ]
+          },
+          "createdBy": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "organization",
+          "name",
+          "chamberNo",
+          "companyCode",
+          "email",
+          "phone",
+          "mobile",
+          "industry",
+          "website",
+          "address",
+          "logo",
+          "createdBy"
+        ]
+      },
+      "CompanyCreationResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "success"
+            ]
+          },
+          "messageId": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "companyCode": {
+                "type": "string"
+              },
+              "organization": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "chamberNo": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "phone": {
+                "type": "string",
+                "pattern": "^[0-9]{10}$"
+              },
+              "mobile": {
+                "type": "string"
+              },
+              "industry": {
+                "type": "string"
+              },
+              "website": {
+                "type": "string",
+                "format": "uri"
+              },
+              "address": {
+                "type": "object",
+                "properties": {
+                  "addressLine1": {
+                    "type": "string"
+                  },
+                  "addressLine2": {
+                    "type": "string"
+                  },
+                  "cityVillage": {
+                    "type": "string"
+                  },
+                  "district": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "pinCode": {
+                    "type": "string",
+                    "pattern": "^[0-9]{5}$"
+                  }
+                }
+              },
+              "logo": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "altText": {
+                    "type": "string"
+                  }
+                }
+              },
+              "isDeleted": {
+                "type": "boolean"
+              },
+              "deletedAt": {
+                "type": [
+                  "null",
+                  "string"
+                ],
+                "format": "date-time"
+              },
+              "createdBy": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "__v": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "required": [
+          "status",
+          "messageId",
+          "message",
+          "data"
+        ]
+      },
+      "CompanyUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "companyCode": {
+            "type": "string"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "cityVillage": {
+                "type": "string"
+              },
+              "district": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "pinCode": {
+                "type": "string",
+                "pattern": "^[0-9]{6}$"
+              }
+            },
+            "required": [
+              "addressLine1",
+              "cityVillage",
+              "district",
+              "state",
+              "pinCode"
+            ]
+          },
+          "updatedBy": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id",
+          "companyCode",
+          "address",
+          "updatedBy"
+        ]
+      },
+      "CompanyUpdateResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "success"
+            ]
+          },
+          "messageId": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "companyCode": {
+                "type": "string"
+              },
+              "organization": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "chamberNo": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "phone": {
+                "type": "string",
+                "pattern": "^[0-9]{10}$"
+              },
+              "mobile": {
+                "type": "string"
+              },
+              "industry": {
+                "type": "string"
+              },
+              "website": {
+                "type": "string",
+                "format": "uri"
+              },
+              "address": {
+                "type": "object",
+                "properties": {
+                  "addressLine1": {
+                    "type": "string"
+                  },
+                  "addressLine2": {
+                    "type": "string"
+                  },
+                  "cityVillage": {
+                    "type": "string"
+                  },
+                  "district": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "pinCode": {
+                    "type": "string",
+                    "pattern": "^[0-9]{6}$"
+                  }
+                }
+              },
+              "logo": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "altText": {
+                    "type": "string"
+                  }
+                }
+              },
+              "isDeleted": {
+                "type": "boolean"
+              },
+              "deletedAt": {
+                "type": [
+                  "null",
+                  "string"
+                ],
+                "format": "date-time"
+              },
+              "createdBy": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "updatedBy": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "__v": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "required": [
+          "status",
+          "messageId",
+          "message",
+          "data"
+        ]
+      },
+      "CompanyRestoreRequest":{
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "updatedBy": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": ["_id", "updatedBy"]
+      },
+      "CompanyRestoreResponse":{
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["success"]
+          },
+          "messageId": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["status", "messageId", "message"]
+      },
+      "CompaniesListResponse":{
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["success"]
+          },
+          "messageId": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "address": {
+                  "type": "object",
+                  "properties": {
+                    "addressLine1": {
+                      "type": "string"
+                    },
+                    "addressLine2": {
+                      "type": "string"
+                    },
+                    "cityVillage": {
+                      "type": "string"
+                    },
+                    "district": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "type": "string"
+                    },
+                    "pinCode": {
+                      "type": "string",
+                      "pattern": "^[0-9]{6}$"
+                    }
+                  },
+                  "required": ["addressLine1", "cityVillage", "district", "state", "pinCode"]
+                },
+                "_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "companyCode": {
+                  "type": "string"
+                },
+                "organization": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "chamberNo": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                "name": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "phone": {
+                  "type": "string",
+                  "pattern": "^[0-9]{10}$"
+                },
+                "mobile": {
+                  "type": "string"
+                },
+                "industry": {
+                  "type": "string"
+                },
+                "website": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "logo": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "altText": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "isDeleted": {
+                  "type": "boolean"
+                },
+                "deletedAt": {
+                  "type": ["string", "null"],
+                  "format": "date-time"
+                },
+                "createdBy": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "__v": {
+                  "type": "integer"
+                },
+                "updatedBy": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    },
+                    "isDeleted": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "__v": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": ["_id", "email", "role", "password", "isDeleted", "createdAt", "updatedAt", "__v"]
+                }
+              },
+              "required": ["address", "_id", "companyCode", "organization", "chamberNo", "name", "email", "phone", "mobile", "industry", "website", "logo", "isDeleted", "createdBy", "createdAt", "updatedAt", "__v", "updatedBy"]
+            }
+          },
+          "totalRecords": {
+            "type": "integer"
+          }
+        },
+        "required": ["status", "messageId", "message", "data", "totalRecords"]
+      },
+      "CompanyResponse":{
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["success"]
+          },
+          "messageId": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "type": "object",
+                "properties": {
+                  "addressLine1": {
+                    "type": "string"
+                  },
+                  "addressLine2": {
+                    "type": "string"
+                  },
+                  "cityVillage": {
+                    "type": "string"
+                  },
+                  "district": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "pinCode": {
+                    "type": "string",
+                    "pattern": "^[0-9]{6}$"
+                  }
+                },
+                "required": ["addressLine1", "cityVillage", "district", "state", "pinCode"]
+              },
+              "_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "companyCode": {
+                "type": "string"
+              },
+              "organization": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "chamberNo": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "phone": {
+                "type": "string",
+                "pattern": "^[0-9]{10}$"
+              },
+              "mobile": {
+                "type": "string"
+              },
+              "industry": {
+                "type": "string"
+              },
+              "website": {
+                "type": "string",
+                "format": "uri"
+              },
+              "logo": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "altText": {
+                    "type": "string"
+                  }
+                }
+              },
+              "isDeleted": {
+                "type": "boolean"
+              },
+              "deletedAt": {
+                "type": ["string", "null"],
+                "format": "date-time"
+              },
+              "createdBy": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "__v": {
+                "type": "integer"
+              },
+              "updatedBy": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": ["address", "_id", "companyCode", "organization", "chamberNo", "name", "email", "phone", "mobile", "industry", "website", "logo", "isDeleted", "deletedAt", "createdBy", "createdAt", "updatedAt", "__v", "updatedBy"]
+          }
+        },
+        "required": ["status", "messageId", "message", "data"]
+      },
+      "AddressCreationRequest":{
+        "type": "object",
+        "properties": {
+          "states": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "state": {
+                  "type": "string"
+                },
+                "districts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "district": {
+                        "type": "string"
+                      },
+                      "tehsils": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "tehsil": {
+                              "type": "string"
+                            },
+                            "villages": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "village": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": ["village"]
+                              }
+                            }
+                          },
+                          "required": ["tehsil", "villages"]
+                        }
+                      }
+                    },
+                    "required": ["district", "tehsils"]
+                  }
+                }
+              },
+              "required": ["state", "districts"]
+            }
+          },
+          "createdBy": {
+            "type": "string"
+          }
+        },
+        "required": ["states", "createdBy"]
+      },
+     "AddressCreationResponse" :{
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "messageId": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "states": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "type": "string"
+                    },
+                    "districts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "district": {
+                            "type": "string"
+                          },
+                          "tehsils": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "tehsil": {
+                                  "type": "string"
+                                },
+                                "villages": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "village": {
+                                        "type": "string"
+                                      },
+                                      "_id": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["village", "_id"]
+                                  }
+                                },
+                                "_id": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": ["tehsil", "villages", "_id"]
+                            }
+                          },
+                          "_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["district", "tehsils", "_id"]
+                      }
+                    },
+                    "_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["state", "districts", "_id"]
+                }
+              },
+              "isDeleted": {
+                "type": "boolean"
+              },
+              "deletedAt": {
+                "type": ["string", "null"]
+              },
+              "createdBy": {
+                "type": "string"
+              },
+              "_id": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              },
+              "__v": {
+                "type": "integer"
+              }
+            },
+            "required": ["states", "isDeleted", "createdBy", "_id", "createdAt", "updatedAt", "__v"]
+          }
+        },
+        "required": ["status", "messageId", "message", "data"]
       }
+      
     }
   },
   "security": [
