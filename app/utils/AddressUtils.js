@@ -1,37 +1,42 @@
 const Joi = require('joi');
+const AddressObj = require('../models/Address');
 
 module.exports = {
+    existsAddress: async function (value) {
+        const address = await AddressObj.findOne({
+            'states.name': value.state,
+            'states.districts.name': value.districts,
+            'states.districts.tehsils.name': value.tehsil,
+            'states.districts.tehsils.villages.name': value.village
+        })
+        return address
+    },
     validateAddress: async function (body) {
-        const alphaSpace = Joi.string().regex(/^[A-Za-z\s]+$/);
-
         const villageSchema = Joi.object({
-            village: alphaSpace.required(),
+            village: Joi.string().required(),
         });
 
         const tehsilSchema = Joi.object({
-            tehsil: alphaSpace.required(),
+            tehsil: Joi.string().required(),
             villages: Joi.array().items(villageSchema),
         });
 
         const districtSchema = Joi.object({
-            district: alphaSpace.required(),
+            district: Joi.string().required(),
             tehsils: Joi.array().items(tehsilSchema),
         });
 
         const stateSchema = Joi.object({
-            state: alphaSpace.required(),
+            state: Joi.string().required(),
             districts: Joi.array().items(districtSchema),
         });
 
         const addressSchema = Joi.object({
             states: Joi.array().items(stateSchema),
-            _id: Joi.string().regex(/^[0-9a-fA-F]{24}$/), // Assuming ObjectId is a string
-            isDeleted: Joi.boolean().default(false),
-            deletedAt: Joi.date().allow(null).default(null),
-            createdBy: Joi.string().regex(/^[0-9a-fA-F]{24}$/), // Assuming ObjectId is a string
-            updatedBy: Joi.string().regex(/^[0-9a-fA-F]{24}$/), // Assuming ObjectId is a string
-            createdAt: Joi.date().timestamp().default(Date.now),
-            updatedAt: Joi.date().timestamp().allow(null).default(null),
+            isDeleted: Joi.boolean(),
+            deletedAt: Joi.date().allow(null),
+            createdBy: Joi.string(),
+            updatedBy: Joi.string(),
         });
         return addressSchema.validate(body);
     }
