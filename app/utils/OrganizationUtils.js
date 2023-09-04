@@ -15,9 +15,7 @@ module.exports = {
         .regex(/^[a-zA-Z\s]+$/)
         .message('Name must contain only letters (a-z or A-Z) and spaces, and be between 3 and 50 characters long.').required(),
       email: Joi.string().email().required(),
-      phone: Joi.string()
-        .regex(/^[0-9]+$/)
-        .messages('phone number should contain only numbers.'),
+      phone: Joi.string().regex(/^\(\d{2,4}\) \d{6,8}$/).message('Invalid Indian landline phone number format');,
       mobile: Joi.string()
         .regex(/^[0-9]{10}$/)
         .required()
