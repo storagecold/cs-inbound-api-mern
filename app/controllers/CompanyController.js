@@ -93,7 +93,7 @@ exports.updateCompany = async (req, res) => {
     try {
         let { name, id, updatedBy } = req.body;
 
-        const admin = await adminUtils.isAdmin({ _id: updatedBy, role: 'admin' })
+        const admin = await adminUtils.isAdmin({ _id: updatedBy, role: 'admin' });
         if (!admin) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
