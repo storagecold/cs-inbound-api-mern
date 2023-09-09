@@ -1,78 +1,80 @@
-const addressObj = require('../models/Address');
-const addressUtils = require('../utils/AddressUtils');
-const adminUtils = require('../utils/AdminUtils')
+const addressObj = require("../models/Address");
+const addressUtils = require("../utils/AddressUtils");
+const adminUtils = require("../utils/AdminUtils");
 
 const STATUS_MESSAGES = {
-    success: 'success',
-    error: 'error',
-    addressNotFound: 'Address does not exist.',
-    addressExists: 'Address with these details already exists.',
-    saveError: 'Error saving address data.',
-    addSuccess: 'Address added successfully',
-    updateSuccess: 'Address updated successfully',
-    retrieveSuccess: 'Address retrieved successfully',
-    updateError: 'Error updating address data.',
-    fetchError: 'Error fetching address.',
-    deleteError: 'Error deleting address.',
-    recordDeleted: 'Record deleted successfully.',
-    restoreSuccess: 'Address restored successfully.',
-    restoreError: 'Error restoring address.',
-    userNotAuthorized: 'Only Admin is authorized to add address',
-    userNotAuthorizedUpdate: 'Only Admin is authorized to update address',
-    userNotAuthorizedDelete: 'Only Admin is authorized to delete address',
-    userNotAuthorizedRestore: 'Only Admin is authorized to restore address'
+  success: "success",
+  error: "error",
+  addressNotFound: "Address does not exist.",
+  addressExists: "Address with these details already exists.",
+  saveError: "Error saving address data.",
+  addSuccess: "Address added successfully",
+  updateSuccess: "Address updated successfully",
+  retrieveSuccess: "Address retrieved successfully",
+  updateError: "Error updating address data.",
+  fetchError: "Error fetching address.",
+  deleteError: "Error deleting address.",
+  recordDeleted: "Record deleted successfully.",
+  restoreSuccess: "Address restored successfully.",
+  restoreError: "Error restoring address.",
+  userNotAuthorized: "Only Admin is authorized to add address",
+  userNotAuthorizedUpdate: "Only Admin is authorized to update address",
+  userNotAuthorizedDelete: "Only Admin is authorized to delete address",
+  userNotAuthorizedRestore: "Only Admin is authorized to restore address",
 };
 
-
 exports.createAddress = async (req, res) => {
-    try {
-        const { error, value } = await addressUtils.validateAddress(req.body);
+  try {
+    const { error, value } = await addressUtils.validateAddress(req.body);
 
-        if (error) {
-            return res.jsonp({
-                status: STATUS_MESSAGES.error,
-                messageId: 400,
-                message: error.details[0].message,
-            });
-        }
-        const admin = await adminUtils.isAdmin({ _id: value.createdBy, role: 'admin' })
-        if (!admin) {
-            return res.jsonp({
-                status: STATUS_MESSAGES.error,
-                messageId: 400,
-                message: STATUS_MESSAGES.userNotAuthorized
-            });
-        }
-        let query = {
-            state: value.state,
-            district: value.district,
-            tehsil: value.tehsil,
-            village: value.village
-        }
-        const foundAddress = await addressUtils.existsAddress(query);
-        if (foundAddress) {
-            return res.jsonp({
-                status: STATUS_MESSAGES.error,
-                messageId: 400,
-                message: STATUS_MESSAGES.addressExists,
-            });
-        }
-        const newAddress = new addressObj(value);
-        const savedAddress = await newAddress.save();
-
-        return res.jsonp({
-            status: STATUS_MESSAGES.success,
-            messageId: 200,
-            message: STATUS_MESSAGES.addSuccess,
-            data: savedAddress,
-        });
-    } catch (error) {
-        return res.jsonp({
-            status: STATUS_MESSAGES.error,
-            messageId: 500,
-            message: error.message,
-        });
+    if (error) {
+      return res.jsonp({
+        status: STATUS_MESSAGES.error,
+        messageId: 400,
+        message: error.details[0].message,
+      });
     }
+    const admin = await adminUtils.isAdmin({
+      _id: value.createdBy,
+      role: "admin",
+    });
+    if (!admin) {
+      return res.jsonp({
+        status: STATUS_MESSAGES.error,
+        messageId: 400,
+        message: STATUS_MESSAGES.userNotAuthorized,
+      });
+    }
+    let query = {
+      state: value.state,
+      district: value.district,
+      tehsil: value.tehsil,
+      village: value.village,
+    };
+    const foundAddress = await addressUtils.existsAddress(query);
+    if (foundAddress) {
+      return res.jsonp({
+        status: STATUS_MESSAGES.error,
+        messageId: 400,
+        message: STATUS_MESSAGES.addressExists,
+      });
+    }
+    const newAddress = new addressObj(value);
+    const savedAddress = await newAddress.save();
+
+    return res.jsonp({
+      status: STATUS_MESSAGES.success,
+      messageId: 200,
+      message: STATUS_MESSAGES.addSuccess,
+      data: savedAddress,
+    });
+  } catch (error) {
+    return res.jsonp({
+      status: STATUS_MESSAGES.error,
+      messageId: 500,
+      message: error.message,
+    });
+  }
 };
 
 exports.updateAddress = async (req, res) => {
@@ -151,29 +153,15 @@ exports.getAddress = async (req, res) => {
   }
 };
 exports.getAddressList = async (req, res) => {
-
-    try {
-        let perPage = Number(req.params.perPage) || 10;
-        let page = Number(req.params.page) || 1;
-
-        const address = await addressObj.find()
-            .skip((perPage * page) - perPage)
-            .limit(perPage);
-
-        const totalCount = await addressObj.countDocuments();
-        if (!address) {
-            return res.jsonp({
-                status: STATUS_MESSAGES.error,
-                messageId: 404,
-                message: STATUS_MESSAGES.addressNotFound,
-            });
-        }
- 
+  try {
+    let perPage = Number(req.params.perPage) || 10;
+    let page = Number(req.params.page) || 1;
 
     const address = await addressObj
       .find()
       .skip(perPage * page - perPage)
       .limit(perPage);
+
     const totalCount = await addressObj.countDocuments();
     if (!address) {
       return res.jsonp({
@@ -211,7 +199,7 @@ exports.deleteAddress = async (req, res) => {
         message: STATUS_MESSAGES.userNotAuthorizedDelete,
       });
     }
- 
+
     const addressToDelete = await addressObj.deleteOne({ _id });
     if (addressToDelete.deletedCount == 0) {
       return res.jsonp({
@@ -219,7 +207,6 @@ exports.deleteAddress = async (req, res) => {
         messageId: 200,
         message: STATUS_MESSAGES.addressNotFound,
       });
- 
     }
     return res.jsonp({
       status: STATUS_MESSAGES.success,
@@ -251,7 +238,7 @@ exports.searchAddress = async (req, res) => {
     if (tehsil) {
       query["states.districts.tehsils.tehsil"] = new RegExp(tehsil, "i");
     }
- 
+
     if (village) {
       query["states.districts.tehsils.villages.village"] = new RegExp(
         village,
@@ -275,4 +262,4 @@ exports.searchAddress = async (req, res) => {
       message: error.message,
     });
   }
-}; 
+};
