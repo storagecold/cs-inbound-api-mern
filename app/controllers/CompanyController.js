@@ -2,12 +2,14 @@ const CompanyObj = require('../models/Company');
 const globalModules = require('../helpers/globalModules');
 const CompanyUtils = require('../utils/CompanyUtils');
 const OrganizationUtils = require('../utils/OrganizationUtils');
-const adminUtils = require('../utils/AdminUtils')
+const addressUtils = require('../utils/AddressUtils');
+const adminUtils = require('../utils/AdminUtils');
 
 const STATUS_MESSAGES = {
     success: 'success',
     error: 'error',
     companyNotFound: 'Company does not exist.',
+    addressNotFound: "The address not exist. Admin, kindly consider adding a new address.",
     companyExists: 'Company with these details already exists.',
     saveError: 'Error saving Company data.',
     updateSuccess: 'Company updated successfully',
@@ -36,6 +38,20 @@ exports.createCompany = async (req, res) => {
                 message: error.details[0].message,
             });
         }
+        let query = {
+            state: value.address.state,
+            district: value.address.district,
+            tehsil: value.address.tehsil,
+            village: value.address.village
+        }
+        const address = await addressUtils.existsAddress(query);
+        if (!address) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.addressNotFound
+            });
+        }
         const admin = await adminUtils.isAdmin({ _id: value.createdBy, role: 'admin' })
         if (!admin) {
             return res.jsonp({
@@ -56,13 +72,12 @@ exports.createCompany = async (req, res) => {
                 message: STATUS_MESSAGES.organizationNotFound
             });
         }
-        let query = {
+        let companyQuery = {
             name: value.name,
             email: value.email,
             companyCode: value.companyCode,
-            "address.cityVillage": value.address.cityVillage
         }
-        const companyExists = await CompanyUtils.CompanyExists(query);
+        const companyExists = await CompanyUtils.CompanyExists(companyQuery);
         if (companyExists) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,

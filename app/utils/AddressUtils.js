@@ -2,14 +2,9 @@ const Joi = require('joi');
 const AddressObj = require('../models/Address');
 
 module.exports = {
-    existsAddress: async function (value) {
-        const address = await AddressObj.findOne({
-            state: value.state,
-            district: value.district,
-            tehsil: value.tehsil,
-            village: value.village
-        })
-        return address
+    existsAddress: async function (query) {
+        const address = await AddressObj.findOne(query)
+        return address;
     },
     validateAddress: async function (body) {
 

@@ -1,20 +1,22 @@
 const organizationObj = require('../models/Organization');
 const globalModules = require('../helpers/globalModules');
-const adminUtils = require('../utils/AdminUtils')
+const adminUtils = require('../utils/AdminUtils');
+const addressUtils = require('../utils/AddressUtils');
 const Utils = require('../utils/OrganizationUtils');
 
 const STATUS_MESSAGES = {
     success: 'success',
     error: 'error',
     organizationNotFound: 'Organization does not exist.',
+    addressNotFound: "The address does not exist. Admin, kindly consider adding a new address.",
     organizationExists: 'Organization with this details already exists.',
     saveError: 'Error saving Organization data.',
-    updateSuccess: 'Organization updated successfully',
-    retrieveSuccess: 'Organization updated successfully',
+    updateSuccess: 'Organization updated successfully.',
+    retrieveSuccess: 'Organization updated successfully.',
     updateError: 'Error updating Organization data.',
     fetchError: 'Error fetching Organization.',
-    userNotAuthorized:'Only Admin is authorized to Create Organozation',
-    userNotAuthorizedUpdate:'Only Admin is authorized to update Organozation'
+    userNotAuthorized: 'Only Admin is authorized to Create Organozation',
+    userNotAuthorizedUpdate: 'Only Admin is authorized to update Organozation'
 };
 
 exports.createOrganization = async (req, res) => {
@@ -22,6 +24,20 @@ exports.createOrganization = async (req, res) => {
         const { error, value } = Utils.OrganizationValidate(req.body);
         if (error) {
             return res.status(400).json({ status: STATUS_MESSAGES.error, message: error.details[0].message });
+        }
+        let query = {
+            state: value.address.state,
+            district: value.address.district,
+            tehsil: value.address.tehsil,
+            village: value.address.village
+        }
+        const address = await addressUtils.existsAddress(query);
+        if (!address) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.addressNotFound
+            });
         }
         const admin = await adminUtils.isAdmin({ _id: value.createdBy, role: 'admin' })
         if (!admin) {
@@ -32,12 +48,11 @@ exports.createOrganization = async (req, res) => {
             });
         }
         value.name = globalModules.firstLetterCapital(value.name);
-        let query = {
+        let inputData = {
             name: value.name,
             email: value.email,
-            "address.cityVillage": value.address.cityVillage
         }
-        const organizationExists = await Utils.OrganizationExists(query, res);
+        const organizationExists = await Utils.OrganizationExists(inputData, res);
         if (organizationExists) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,

@@ -33,7 +33,13 @@ module.exports = {
                     .min(3)
                     .max(15)
                     .pattern(/^[a-zA-Z\s]+$/),
-                cityVillage: Joi.string()
+                village: Joi.string()
+                    .trim()
+                    .min(3)
+                    .max(30)
+                    .pattern(/^[a-zA-Z\s]+$/)
+                    .required(),
+                tessil: Joi.string()
                     .trim()
                     .min(3)
                     .max(30)
