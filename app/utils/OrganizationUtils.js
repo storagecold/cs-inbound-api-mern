@@ -13,8 +13,12 @@ module.exports = {
         .max(50)
         .pattern(/^[a-zA-Z\s]+$/)
         .required(),
-      email: Joi.string().email().required(),
-      phone: Joi.string().pattern(/^[0-9]+$/),
+      email: Joi.string()
+        .email()
+        .required(),
+      phone: Joi.string()
+          .pattern(/^\(\d{2,5}\) \d{6,8}$/)
+          .message('Invalid Indian landline phone number format'),
       mobile: Joi.string()
         .pattern(/^[0-9]{10}$/)
         .required(),

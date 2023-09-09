@@ -1,34 +1,9 @@
 const mongoose = require('mongoose');
-
-const villageSchema = new mongoose.Schema({
-  village: String,
-});
-
-const tehsilSchema = new mongoose.Schema({
-  tehsil: String,
-  villages: [villageSchema],
-});
-
-const districtSchema = new mongoose.Schema({
-  district: String,
-  tehsils: [tehsilSchema],
-});
-
-const stateSchema = new mongoose.Schema({
-  state: String,
-  districts: [districtSchema],
-});
-
 const addressSchema = new mongoose.Schema({
-  states: [stateSchema],
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
-  deletedAt: {
-    type: Date,
-    default: null,
-  },
+  village: String,
+  tehsil: String,
+  district: String,
+  state: String,
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
