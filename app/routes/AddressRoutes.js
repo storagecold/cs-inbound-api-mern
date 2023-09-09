@@ -7,8 +7,8 @@ const AddressController = require('../controllers/AddressController');
 router.post('/addresses', checkAuth, AddressController.createAddress);
 router.put('/addresses', checkAuth, AddressController.updateAddress);
 router.get('/addresses/:id', checkAuth, AddressController.getAddress);
-router.get('/addresses/:page/:perPage', checkAuth, AddressController.getAllAddress);
+router.get('/addresses/:page/:perPage', checkAuth, AddressController.getAddressList);
 router.delete('/addresses', checkAuth, AddressController.deleteAddress);
-// router.post('/addresses/search', checkAuth, AddressController.searchAddress);
+router.post('/addresses/search', checkAuth, AddressController.searchAddress);
 
 module.exports = router;

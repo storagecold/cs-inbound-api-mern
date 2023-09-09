@@ -24,6 +24,51 @@ const STATUS_MESSAGES = {
 };
 
 
+// exports.createAddress = async (req, res) => {
+//     try {
+//         const { error, value } = await addressUtils.validateAddress(req.body);
+
+//         if (error) {
+//             return res.jsonp({
+//                 status: STATUS_MESSAGES.error,
+//                 messageId: 400,
+//                 message: error.details[0].message,
+//             });
+//         }
+//         const admin = await adminUtils.isAdmin({ _id: value.createdBy, role: 'admin' })
+//         if (!admin) {
+//             return res.jsonp({
+//                 status: STATUS_MESSAGES.error,
+//                 messageId: 400,
+//                 message: STATUS_MESSAGES.userNotAuthorized
+//             });
+//         }
+
+//         const foundAddress = await addressUtils.existsAddress(value);
+//         if (foundAddress) {
+//             return res.jsonp({
+//                 status: STATUS_MESSAGES.error,
+//                 messageId: 400,
+//                 message: STATUS_MESSAGES.addressExists,
+//             });
+//         }
+//         const newAddress = new addressObj(value);
+//         const savedAddress = await newAddress.save();
+
+//         return res.jsonp({
+//             status: STATUS_MESSAGES.success,
+//             messageId: 200,
+//             message: STATUS_MESSAGES.addSuccess,
+//             data: savedAddress,
+//         });
+//     } catch (error) {
+//         return res.jsonp({
+//             status: STATUS_MESSAGES.error,
+//             messageId: 500,
+//             message: error.message,
+//         });
+//     }
+// };
 exports.createAddress = async (req, res) => {
     try {
         const { error, value } = await addressUtils.validateAddress(req.body);
@@ -132,15 +177,14 @@ exports.getAddress = async (req, res) => {
         });
     }
 };
-exports.getAllAddress = async (req, res) => {
+exports.getAddressList = async (req, res) => {
     try {
         let perPage = Number(req.params.perPage) || 10;
         let page = Number(req.params.page) || 1;
 
         const address = await addressObj.find({ isDeleted: false })
             .skip((perPage * page) - perPage)
-            .limit(perPage)
-            .populate('updatedBy');
+            .limit(perPage);
         const totalCount = await addressObj.countDocuments();
         if (!address) {
             return res.jsonp({
@@ -165,3 +209,83 @@ exports.getAllAddress = async (req, res) => {
         });
     }
 };
+
+exports.deleteAddress = async (req, res) => {
+    try {
+
+        let { _id, updatedBy } = req.body;
+
+        const admin = await adminUtils.isAdmin({ _id: updatedBy, role: 'admin' });
+        if (!admin) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.userNotAuthorizedDelete
+            });
+        }
+
+        const addressToSoftDelete = await addressObj.findOne({ _id });
+
+        if (!addressToSoftDelete) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 404,
+                message: STATUS_MESSAGES.addressNotFound,
+            });
+        }
+
+        addressToSoftDelete.isDeleted = true;
+        addressToSoftDelete.deletedAt = new Date();
+        await addressToSoftDelete.save();
+
+        return res.jsonp({
+            status: STATUS_MESSAGES.success,
+            messageId: 200,
+            message: STATUS_MESSAGES.recordDeleted,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: STATUS_MESSAGES.error,
+            messageId: 500,
+            message: STATUS_MESSAGES.deleteError
+        });
+    }
+}
+
+exports.searchAddress = async (req, res) => {
+    try {
+        const { state, district, tehsil, village } = req.body;
+        // trimSerach = searchText ? searchText.trim() : '';
+        const query = {};
+
+        if (state) {
+            query['states.state'] = new RegExp(state, 'i');
+        }
+        if (district) {
+            query['states.districts.district'] = new RegExp(district, 'i');
+        }
+        if (tehsil) {
+            query['states.districts.tehsils.tehsil'] = new RegExp(tehsil, 'i');
+        }
+        if (village) {
+            query['states.districts.tehsils.villages.village'] = new RegExp(village, 'i');
+        }
+
+        const addresses = await addressObj.find(query);
+        const totalCount = addressObj.count(query)
+        return res.jsonp({
+            status: STATUS_MESSAGES.success,
+            messageId: 200,
+            message: STATUS_MESSAGES.retrieveSuccess,
+            addresses,
+            totalCount
+        })
+
+    } catch (error) {
+        return res.jsonp({
+            status: STATUS_MESSAGES.error,
+            messageId: 500,
+            message: error.message
+        })
+    }
+}
