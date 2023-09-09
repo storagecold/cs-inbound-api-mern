@@ -9,12 +9,13 @@ const OrganizationSchema = new Schema({
     industry: String,
     website: String,
     address: {
-        addressLine1:String,
-        addressLine2:String,
-        cityVillage:String,
-        district:String,
-        state:String,
-        pinCode:String
+        addressLine1: String,
+        addressLine2: String,
+        village: String,
+        tehsil: String,
+        district: String,
+        state: String,
+        pinCode: String
     },
     logo: Object,
     owner: [String],

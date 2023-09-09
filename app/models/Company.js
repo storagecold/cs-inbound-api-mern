@@ -28,7 +28,8 @@ const CompanySchema = new mongoose.Schema(
     address: {
       addressLine1:String,
       addressLine2:String,
-      cityVillage: String,
+      village: String,
+      tehsil: String,
       district: String,
       state: String,
       pinCode: String,

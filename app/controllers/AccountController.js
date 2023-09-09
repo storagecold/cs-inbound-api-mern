@@ -2,12 +2,13 @@ const AccountObj = require('../models/Account');
 const globalModules = require('../helpers/globalModules');
 const AccountUtils = require('../utils/AccountUtils');
 const CompanyUtils = require('../utils/CompanyUtils');
+const addressUtils = require('../utils/AddressUtils');
 
 const STATUS_MESSAGES = {
     success: 'success',
     error: 'error',
     accountNotFound: 'Account does not exist.',
-    companyNotFound: 'Account does not exist.',
+    addressNotFound: "The organization does not appear to exist. Admin, kindly consider adding a new address.",
     accountExists: 'Account with these details already exists.',
     saveSuccess: 'Account added successfully.',
     saveError: 'Error saving Account data.',
@@ -32,10 +33,8 @@ exports.createAccount = async (req, res) => {
                 message: error.details[0].message
             });
         }
-        value.firstName = globalModules.firstLetterCapital(value.firstName);
-        value.lastName = globalModules.firstLetterCapital(value.lastName);
 
-        const companyExists = await CompanyUtils.CompanyExists({_id:value.company});
+        const companyExists = await CompanyUtils.CompanyExists({ _id: value.company });
         if (!companyExists) {
             return res.json({
                 status: STATUS_MESSAGES.error,
@@ -43,19 +42,37 @@ exports.createAccount = async (req, res) => {
                 message: STATUS_MESSAGES.companyNotFound,
             });
         }
-        let query = {
+        let accountQuery = {
             firstName: value.firstName,
             careOfName: value.careOfName,
             "address.village": value.address.village
         }
-        const accountExists = await AccountUtils.AccountExists(query, res);
+        const accountExists = await AccountUtils.AccountExists(accountQuery, res);
         if (accountExists) {
             return res.json({
                 status: STATUS_MESSAGES.error,
                 messageId: 400,
                 message: STATUS_MESSAGES.accountExists,
             });
+        };
+        let query = {
+            state: value.address.state,
+            district: value.address.district,
+            tehsil: value.address.tehsil,
+            village: value.address.village
         }
+        const address = await addressUtils.existsAddress(query);
+        if (!address) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.addressNotFound
+            });
+        };
+
+        value.firstName = globalModules.firstLetterCapital(value.firstName);
+        value.lastName = globalModules.firstLetterCapital(value.lastName);
+
 
         await AccountUtils.GetAccountNumber(value);
 
@@ -114,7 +131,7 @@ exports.updateAccount = async (req, res) => {
 exports.deleteAccount = async (req, res) => {
     try {
         const { accountNumber } = req.params;
-        const accountToSoftDelete = await AccountObj.findOne({ accountNumber ,isDeleted:false});
+        const accountToSoftDelete = await AccountObj.findOne({ accountNumber, isDeleted: false });
 
         if (!accountToSoftDelete) {
             return res.jsonp({
@@ -145,7 +162,7 @@ exports.deleteAccount = async (req, res) => {
 exports.restoreAccount = async (req, res) => {
     try {
         const { accountNumber } = req.params;
-        const accountToRestore = await AccountObj.findOne({ accountNumber ,isDeleted:true});
+        const accountToRestore = await AccountObj.findOne({ accountNumber, isDeleted: true });
 
         if (!accountToRestore) {
             return res.jsonp({

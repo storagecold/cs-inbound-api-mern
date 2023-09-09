@@ -43,8 +43,13 @@ exports.createAddress = async (req, res) => {
                 message: STATUS_MESSAGES.userNotAuthorized
             });
         }
-
-        const foundAddress = await addressUtils.existsAddress(value);
+        let query = {
+            state: value.state,
+            district: value.district,
+            tehsil: value.tehsil,
+            village: value.village
+        }
+        const foundAddress = await addressUtils.existsAddress(query);
         if (foundAddress) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -146,9 +151,24 @@ exports.getAddress = async (req, res) => {
   }
 };
 exports.getAddressList = async (req, res) => {
-  try {
-    let perPage = Number(req.params.perPage) || 10;
-    let page = Number(req.params.page) || 1;
+
+    try {
+        let perPage = Number(req.params.perPage) || 10;
+        let page = Number(req.params.page) || 1;
+
+        const address = await addressObj.find()
+            .skip((perPage * page) - perPage)
+            .limit(perPage);
+
+        const totalCount = await addressObj.countDocuments();
+        if (!address) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 404,
+                message: STATUS_MESSAGES.addressNotFound,
+            });
+        }
+ 
 
     const address = await addressObj
       .find()
@@ -191,7 +211,7 @@ exports.deleteAddress = async (req, res) => {
         message: STATUS_MESSAGES.userNotAuthorizedDelete,
       });
     }
-
+ 
     const addressToDelete = await addressObj.deleteOne({ _id });
     if (addressToDelete.deletedCount == 0) {
       return res.jsonp({
@@ -199,6 +219,7 @@ exports.deleteAddress = async (req, res) => {
         messageId: 200,
         message: STATUS_MESSAGES.addressNotFound,
       });
+ 
     }
     return res.jsonp({
       status: STATUS_MESSAGES.success,
@@ -230,6 +251,7 @@ exports.searchAddress = async (req, res) => {
     if (tehsil) {
       query["states.districts.tehsils.tehsil"] = new RegExp(tehsil, "i");
     }
+ 
     if (village) {
       query["states.districts.tehsils.villages.village"] = new RegExp(
         village,
@@ -253,4 +275,4 @@ exports.searchAddress = async (req, res) => {
       message: error.message,
     });
   }
-};
+}; 

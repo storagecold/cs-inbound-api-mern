@@ -17,8 +17,8 @@ module.exports = {
         .email()
         .required(),
       phone: Joi.string()
-          .pattern(/^\(\d{2,5}\) \d{6,8}$/)
-          .message('Invalid Indian landline phone number format'),
+        .pattern(/^\(\d{2,5}\) \d{6,8}$/)
+        .message('Invalid Indian landline phone number format'),
       mobile: Joi.string()
         .pattern(/^[0-9]{10}$/)
         .required(),
@@ -35,7 +35,13 @@ module.exports = {
           .min(3)
           .max(15)
           .pattern(/^[a-zA-Z\s]+$/),
-        cityVillage: Joi.string()
+        village: Joi.string()
+          .trim()
+          .min(3)
+          .max(30)
+          .pattern(/^[a-zA-Z\s]+$/)
+          .required(),
+        tehsil: Joi.string()
           .trim()
           .min(3)
           .max(30)

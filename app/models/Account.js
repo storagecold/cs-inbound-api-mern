@@ -23,7 +23,8 @@ const AccountSchema = new Schema({
   address: {
     addressLine1:String,
     addressLine2:String,
-    cityVillage: String,
+    village: String,
+    tehsil: String,
     distict: String,
     state: String,
     pinCode: Number

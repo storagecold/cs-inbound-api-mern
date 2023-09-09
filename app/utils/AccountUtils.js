@@ -26,7 +26,12 @@ module.exports = {
             .alphanum().allow('').required()
                 .min(3)
                 .max(15),
-            cityVillage: Joi.string()
+            village: Joi.string()
+                .trim()
+                .min(3)
+                .max(15)
+                .regex(/^[a-zA-Z\s]+$/),
+            tehsil: Joi.string()
                 .trim()
                 .min(3)
                 .max(15)
