@@ -5,7 +5,7 @@ module.exports = {
     existsAddress: async function (value) {
         const address = await AddressObj.findOne({
             state: value.state,
-            district: value.districts,
+            district: value.district,
             tehsil: value.tehsil,
             village: value.village
         })
