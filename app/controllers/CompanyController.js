@@ -77,7 +77,7 @@ exports.createCompany = async (req, res) => {
             email: value.email,
             companyCode: value.companyCode,
         }
-        
+
         const companyExists = await CompanyUtils.CompanyExists(companyQuery);
 
         if (companyExists) {
@@ -108,7 +108,32 @@ exports.createCompany = async (req, res) => {
 
 exports.updateCompany = async (req, res) => {
     try {
-        let { name, id, updatedBy } = req.body;
+        const { error, value } = CompanyUtils.ComapnyValidate(req.body);
+
+        if (error) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: error.details[0].message,
+            });
+        }
+        let query = {
+            state: value.address.state,
+            district: value.address.district,
+            tehsil: value.address.tehsil,
+            village: value.address.village
+        }
+
+        const address = await addressUtils.existsAddress(query);
+        if (!address) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.addressNotFound
+            });
+        }
+
+        let { name, _id, updatedBy } = value;
 
         const admin = await adminUtils.isAdmin({ _id: updatedBy, role: 'admin' });
         if (!admin) {
@@ -123,7 +148,7 @@ exports.updateCompany = async (req, res) => {
             name = globalModules.firstLetterCapital(name);
         }
 
-        const companyExists = await CompanyObj.findOne({ _id: id });
+        const companyExists = await CompanyObj.findOne({ _id });
         if (!companyExists) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -131,7 +156,7 @@ exports.updateCompany = async (req, res) => {
                 message: STATUS_MESSAGES.companyNotFound,
             });
         }
-        companyExists.set(req.body);
+        companyExists.set(value);
         const savedCompany = await companyExists.save();
         return res.jsonp({
             status: STATUS_MESSAGES.success,
@@ -151,7 +176,7 @@ exports.updateCompany = async (req, res) => {
 exports.getCompany = async (req, res) => {
     try {
         const companyId = req.params.id;
-        const company = await CompanyObj.findOne({ _id: companyId });
+        const company = await CompanyObj.findOne({ _id: companyId, isDeleted: false });
 
         if (!company) {
             return res.jsonp({
@@ -204,7 +229,7 @@ exports.getAllCompanies = async (req, res) => {
 
 exports.deleteCompany = async (req, res) => {
     try {
-        const { updatedBy, id } = req.body;
+        const { updatedBy, _id } = req.body;
 
         const admin = await adminUtils.isAdmin({ _id: updatedBy, role: 'admin' })
         if (!admin) {
@@ -215,7 +240,7 @@ exports.deleteCompany = async (req, res) => {
             });
         }
 
-        const companyToSoftDelete = await CompanyObj.findOne({ _id: id });
+        const companyToSoftDelete = await CompanyObj.findOne({ _id, isDeleted: false });
 
         if (!companyToSoftDelete) {
             return res.jsonp({
@@ -255,9 +280,9 @@ exports.restoreCompany = async (req, res) => {
                 message: STATUS_MESSAGES.userNotAuthorizedRestore
             });
         }
-        const companyToSoftDelete = await CompanyObj.findOne({ _id });
+        const restoreCompany = await CompanyObj.findOne({ _id, isDeleted: true });
 
-        if (!companyToSoftDelete) {
+        if (!restoreCompany) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
                 messageId: 404,
@@ -265,14 +290,14 @@ exports.restoreCompany = async (req, res) => {
             });
         }
 
-        companyToSoftDelete.isDeleted = false;
-        companyToSoftDelete.deletedAt = new Date();
-        await companyToSoftDelete.save();
+        restoreCompany.isDeleted = false;
+        restoreCompany.deletedAt = new Date();
+        await restoreCompany.save();
 
         return res.jsonp({
             status: STATUS_MESSAGES.success,
             messageId: 200,
-            message: STATUS_MESSAGES.recordDeleted,
+            message: STATUS_MESSAGES.restoreSuccess,
         });
     } catch (error) {
         return res.jsonp({
@@ -285,7 +310,7 @@ exports.restoreCompany = async (req, res) => {
 
 exports.searchCompany = async (req, res) => {
     try {
-        const { search } = req.query;
+        const { search } = req.body;
         const trimmedSearch = search ? search.trim() : '';
         let query = {};
 

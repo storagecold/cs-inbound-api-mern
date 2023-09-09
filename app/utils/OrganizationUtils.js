@@ -84,6 +84,7 @@ module.exports = {
       createdBy: Joi.string(),
 
       updatedBy: Joi.string(),
+      _id: Joi.string(),
     });
 
     return schema.validate(body);

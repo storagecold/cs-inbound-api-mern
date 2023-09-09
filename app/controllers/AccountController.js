@@ -25,7 +25,7 @@ const STATUS_MESSAGES = {
 
 exports.createAccount = async (req, res) => {
     try {
-        const { error, value } = Utils.AccountValidate(req.body);
+        const { error, value } = AccountUtils.AccountValidate(req.body);
         if (error) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -45,9 +45,11 @@ exports.createAccount = async (req, res) => {
         let accountQuery = {
             firstName: value.firstName,
             careOfName: value.careOfName,
-            "address.village": value.address.village
+            "address.village": value.address.village,
+            "address.tehsil": value.address.tehsil,
+            "address.district": value.address.district
         }
-        const accountExists = await AccountUtils.AccountExists(accountQuery, res);
+        const accountExists = await AccountUtils.AccountExists(accountQuery);
         if (accountExists) {
             return res.json({
                 status: STATUS_MESSAGES.error,
@@ -96,10 +98,34 @@ exports.createAccount = async (req, res) => {
 
 exports.updateAccount = async (req, res) => {
     try {
-        if (req.body.firstName) {
-            req.body.firstName = globalModules.firstLetterCapital(req.body.firstName);
+        const { error, value } = Utils.AccountValidate(req.body);
+        if (error) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: error.details[0].message
+            });
         }
-        const { accountNumber } = req.body;
+        let query = {
+            state: value.address.state,
+            district: value.address.district,
+            tehsil: value.address.tehsil,
+            village: value.address.village
+        }
+        const address = await addressUtils.existsAddress(query);
+        if (!address) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.addressNotFound
+            });
+        };
+
+        const { firstName, accountNumber } = value;
+
+        if (firstName) {
+            firstName = globalModules.firstLetterCapital(firstName);
+        }
         const existingAccount = await AccountObj.findOne({ accountNumber });
 
         if (!existingAccount) {
@@ -110,7 +136,7 @@ exports.updateAccount = async (req, res) => {
             });
         }
 
-        existingAccount.set(req.body);
+        existingAccount.set(value);
         const updatedAccount = await existingAccount.save();
 
         return res.jsonp({

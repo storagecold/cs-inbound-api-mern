@@ -39,7 +39,7 @@ module.exports = {
                     .max(30)
                     .pattern(/^[a-zA-Z\s]+$/)
                     .required(),
-                tessil: Joi.string()
+                tehsil: Joi.string()
                     .trim()
                     .min(3)
                     .max(30)
@@ -63,7 +63,8 @@ module.exports = {
             isDeleted: Joi.boolean(),
             deletedAt: Joi.date().allow(null),
             createdBy: Joi.string(),
-            updatedBy: Joi.string()
+            updatedBy: Joi.string(),
+            _id: Joi.string()
         });
         return schema.validate(body)
 
