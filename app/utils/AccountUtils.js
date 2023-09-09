@@ -23,7 +23,7 @@ module.exports = {
                 .min(3)
                 .max(15),
             addressLine2: Joi.string()
-            .alphanum().allow('').required()
+            .alphanum().allow('')
                 .min(3)
                 .max(15),
             village: Joi.string()

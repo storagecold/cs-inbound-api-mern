@@ -224,36 +224,26 @@ exports.deleteAddress = async (req, res) => {
 
 exports.searchAddress = async (req, res) => {
   try {
-    //TODO change search logic as per new standard address model.
-    const { state, district, tehsil, village } = req.body;
-    // trimSerach = searchText ? searchText.trim() : '';
-    const query = {};
+    const { search } = req.body;
+    const trimmedSearch = search ? search.trim() : '';
+    let query = {};
 
-    if (state) {
-      query["states.state"] = new RegExp(state, "i");
-    }
-    if (district) {
-      query["states.districts.district"] = new RegExp(district, "i");
-    }
-    if (tehsil) {
-      query["states.districts.tehsils.tehsil"] = new RegExp(tehsil, "i");
-    }
-
-    if (village) {
-      query["states.districts.tehsils.villages.village"] = new RegExp(
-        village,
-        "i"
-      );
+    if (trimmedSearch) {
+        query = {
+            $or: [
+                { district: { $regex: trimmedSearch, $options: 'i' } },
+                { tehsil: { $regex: trimmedSearch, $options: 'i' } },
+                { village: { $regex: trimmedSearch, $options: 'i' } },
+            ]
+        };
     }
 
     const addresses = await addressObj.find(query);
-    const totalCount = addressObj.count(query);
     return res.jsonp({
       status: STATUS_MESSAGES.success,
       messageId: 200,
       message: STATUS_MESSAGES.retrieveSuccess,
       addresses,
-      totalCount,
     });
   } catch (error) {
     return res.jsonp({

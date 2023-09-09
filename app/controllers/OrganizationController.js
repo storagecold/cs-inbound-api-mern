@@ -12,7 +12,7 @@ const STATUS_MESSAGES = {
     organizationExists: 'Organization with this details already exists.',
     saveError: 'Error saving Organization data.',
     updateSuccess: 'Organization updated successfully.',
-    retrieveSuccess: 'Organization updated successfully.',
+    retrieveSuccess: 'Organization retrived successfully.',
     updateError: 'Error updating Organization data.',
     fetchError: 'Error fetching Organization.',
     userNotAuthorized: 'Only Admin is authorized to Create Organozation',
@@ -81,9 +81,27 @@ exports.createOrganization = async (req, res) => {
 
 exports.updateOrganization = async (req, res) => {
     try {
-        const organizationId = req.body.id;
+        const { error, value } = Utils.OrganizationValidate(req.body);
+        if (error) {
+            return res.status(400).json({ status: STATUS_MESSAGES.error, message: error.details[0].message });
+        }
+        let query = {
+            state: value.address.state,
+            district: value.address.district,
+            tehsil: value.address.tehsil,
+            village: value.address.village
+        }
+        const address = await addressUtils.existsAddress(query);
+        if (!address) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.addressNotFound
+            });
+        }
+        let {name,_id,updatedBy} = value;
 
-        const admin = await adminUtils.isAdmin({ _id: req.body.updatedBy, role: 'admin' })
+        const admin = await adminUtils.isAdmin({ _id: updatedBy, role: 'admin' })
         if (!admin) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -91,11 +109,11 @@ exports.updateOrganization = async (req, res) => {
                 message: STATUS_MESSAGES.userNotAuthorizedUpdate
             });
         }
-        if (req.body.name) {
-            req.body.name = globalModules.firstLetterCapital(req.body.name);
+        if (name) {
+            name = globalModules.firstLetterCapital(name);
         }
 
-        const existingOrganization = await organizationObj.findById(organizationId);
+        const existingOrganization = await organizationObj.findById({_id});
         if (!existingOrganization) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -104,8 +122,8 @@ exports.updateOrganization = async (req, res) => {
             });
         }
 
-        existingOrganization.set(req.body);
-        const updatedOrganization = await existingOrganization.save();
+        existingOrganization.set(value);
+        const updatedOrganization = (await existingOrganization.save());
 
         return res.jsonp({
             status: STATUS_MESSAGES.success,
