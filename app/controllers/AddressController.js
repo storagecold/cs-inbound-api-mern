@@ -76,68 +76,82 @@ exports.createAddress = async (req, res) => {
 };
 
 exports.updateAddress = async (req, res) => {
-    try {
-        let { _id, updatedBy } = req.body;
+  try {
+    const { error, value } = await addressUtils.validateAddress(req.body);
 
-        const admin = await adminUtils.isAdmin({ _id: updatedBy, role: 'admin' });
-        if (!admin) {
-            return res.jsonp({
-                status: STATUS_MESSAGES.error,
-                messageId: 400,
-                message: STATUS_MESSAGES.userNotAuthorizedUpdate
-            });
-        }
-        const addressExists = await addressObj.findOne({ _id });
-        if (!addressExists) {
-            return res.jsonp({
-                status: STATUS_MESSAGES.error,
-                messageId: 400,
-                message: STATUS_MESSAGES.addressNotFound,
-            });
-        }
-        addressExists.set(req.body);
-        await addressExists.save();
-        return res.jsonp({
-            status: STATUS_MESSAGES.success,
-            messageId: 200,
-            message: STATUS_MESSAGES.updateSuccess
-        })
-    } catch (error) {
-        return res.jsonp({
-            status: error,
-            messageId: 500,
-            message: error.message
-        });
+    if (error) {
+      return res.jsonp({
+        status: STATUS_MESSAGES.error,
+        messageId: 400,
+        message: error.details[0].message,
+      });
     }
+
+    let { _id, updatedBy } = value;
+
+    const admin = await adminUtils.isAdmin({
+      _id: updatedBy,
+      role: "admin",
+    });
+    if (!admin) {
+      return res.jsonp({
+        status: STATUS_MESSAGES.error,
+        messageId: 400,
+        message: STATUS_MESSAGES.userNotAuthorizedUpdate,
+      });
+    }
+    const addressExists = await addressObj.findOne({ _id });
+    if (!addressExists) {
+      return res.jsonp({
+        status: STATUS_MESSAGES.error,
+        messageId: 400,
+        message: STATUS_MESSAGES.addressNotFound,
+      });
+    }
+    addressExists.set(value);
+    await addressExists.save();
+    return res.jsonp({
+      status: STATUS_MESSAGES.success,
+      messageId: 200,
+      message: STATUS_MESSAGES.updateSuccess,
+    });
+  } catch (error) {
+    return res.jsonp({
+      status: error,
+      messageId: 500,
+      message: error.message,
+    });
+  }
 };
 
 exports.getAddress = async (req, res) => {
-    try {
-        const _id = req.params.id;
-        const address = await addressObj.findOne({ _id })
-        if (!address) {
-            return res.jsonp({
-                status: STATUS_MESSAGES.error,
-                messageId: 404,
-                message: STATUS_MESSAGES.addressNotFound,
-            });
-        }
-
-        return res.jsonp({
-            status: STATUS_MESSAGES.success,
-            messageId: 200,
-            message: STATUS_MESSAGES.retrieveSuccess,
-            data: address,
-        });
-    } catch (error) {
-        return res.jsonp({
-            status: STATUS_MESSAGES.error,
-            messageId: 500,
-            message: STATUS_MESSAGES.fetchError,
-        });
+  try {
+    const _id = req.params.id;
+    const address = await addressObj.findOne({ _id });
+    if (!address) {
+      return res.jsonp({
+        status: STATUS_MESSAGES.error,
+        messageId: 404,
+        message: STATUS_MESSAGES.addressNotFound,
+      });
     }
+
+    return res.jsonp({
+      status: STATUS_MESSAGES.success,
+      messageId: 200,
+      message: STATUS_MESSAGES.retrieveSuccess,
+      data: address,
+    });
+  } catch (error) {
+    return res.jsonp({
+      status: STATUS_MESSAGES.error,
+      messageId: 500,
+      message: STATUS_MESSAGES.fetchError,
+    });
+  }
 };
 exports.getAddressList = async (req, res) => {
+
     try {
         let perPage = Number(req.params.perPage) || 10;
         let page = Number(req.params.page) || 1;
@@ -154,94 +168,111 @@ exports.getAddressList = async (req, res) => {
                 message: STATUS_MESSAGES.addressNotFound,
             });
         }
+ 
 
-        return res.jsonp({
-            status: STATUS_MESSAGES.success,
-            messageId: 200,
-            message: STATUS_MESSAGES.retrieveSuccess,
-            data: address,
-            totalCount
-        });
-    } catch (error) {
-        return res.jsonp({
-            status: STATUS_MESSAGES.error,
-            messageId: 500,
-            message: STATUS_MESSAGES.fetchError,
-        });
+    const address = await addressObj
+      .find()
+      .skip(perPage * page - perPage)
+      .limit(perPage);
+    const totalCount = await addressObj.countDocuments();
+    if (!address) {
+      return res.jsonp({
+        status: STATUS_MESSAGES.error,
+        messageId: 404,
+        message: STATUS_MESSAGES.addressNotFound,
+      });
     }
+
+    return res.jsonp({
+      status: STATUS_MESSAGES.success,
+      messageId: 200,
+      message: STATUS_MESSAGES.retrieveSuccess,
+      data: address,
+      totalCount,
+    });
+  } catch (error) {
+    return res.jsonp({
+      status: STATUS_MESSAGES.error,
+      messageId: 500,
+      message: STATUS_MESSAGES.fetchError,
+    });
+  }
 };
 
 exports.deleteAddress = async (req, res) => {
-    try {
+  try {
+    let { _id, updatedBy } = req.body;
 
-        let { _id, updatedBy } = req.body;
-
-        const admin = await adminUtils.isAdmin({ _id: updatedBy, role: 'admin' });
-        if (!admin) {
-            return res.jsonp({
-                status: STATUS_MESSAGES.error,
-                messageId: 400,
-                message: STATUS_MESSAGES.userNotAuthorizedDelete
-            });
-        }
-
-        const addressToSoftDelete = await addressObj.deleteOne({ _id });
-        if (addressToSoftDelete.deletedCount == 0) {
-            return res.jsonp({
-                status: STATUS_MESSAGES.success,
-                messageId: 200,
-                message: STATUS_MESSAGES.addressNotFound,
-            });
-        }
-        return res.jsonp({
-            status: STATUS_MESSAGES.success,
-            messageId: 200,
-            message: STATUS_MESSAGES.recordDeleted,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            status: STATUS_MESSAGES.error,
-            messageId: 500,
-            message: STATUS_MESSAGES.deleteError
-        });
+    const admin = await adminUtils.isAdmin({ _id: updatedBy, role: "admin" });
+    if (!admin) {
+      return res.jsonp({
+        status: STATUS_MESSAGES.error,
+        messageId: 400,
+        message: STATUS_MESSAGES.userNotAuthorizedDelete,
+      });
     }
-}
+ 
+    const addressToDelete = await addressObj.deleteOne({ _id });
+    if (addressToDelete.deletedCount == 0) {
+      return res.jsonp({
+        status: STATUS_MESSAGES.success,
+        messageId: 200,
+        message: STATUS_MESSAGES.addressNotFound,
+      });
+ 
+    }
+    return res.jsonp({
+      status: STATUS_MESSAGES.success,
+      messageId: 200,
+      message: STATUS_MESSAGES.recordDeleted,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: STATUS_MESSAGES.error,
+      messageId: 500,
+      message: STATUS_MESSAGES.deleteError,
+    });
+  }
+};
 
 exports.searchAddress = async (req, res) => {
-    try {
-        const { state, district, tehsil, village } = req.body;
-        // trimSerach = searchText ? searchText.trim() : '';
-        const query = {};
+  try {
+    //TODO change search logic as per new standard address model.
+    const { state, district, tehsil, village } = req.body;
+    // trimSerach = searchText ? searchText.trim() : '';
+    const query = {};
 
-        if (state) {
-            query['states.state'] = new RegExp(state, 'i');
-        }
-        if (district) {
-            query['states.districts.district'] = new RegExp(district, 'i');
-        }
-        if (tehsil) {
-            query['states.districts.tehsils.tehsil'] = new RegExp(tehsil, 'i');
-        }
-        if (village) {
-            query['states.districts.tehsils.villages.village'] = new RegExp(village, 'i');
-        }
-
-        const addresses = await addressObj.find(query);
-        const totalCount = addressObj.count(query)
-        return res.jsonp({
-            status: STATUS_MESSAGES.success,
-            messageId: 200,
-            message: STATUS_MESSAGES.retrieveSuccess,
-            addresses,
-            totalCount
-        })
-
-    } catch (error) {
-        return res.jsonp({
-            status: STATUS_MESSAGES.error,
-            messageId: 500,
-            message: error.message
-        })
+    if (state) {
+      query["states.state"] = new RegExp(state, "i");
     }
-}
+    if (district) {
+      query["states.districts.district"] = new RegExp(district, "i");
+    }
+    if (tehsil) {
+      query["states.districts.tehsils.tehsil"] = new RegExp(tehsil, "i");
+    }
+ 
+    if (village) {
+      query["states.districts.tehsils.villages.village"] = new RegExp(
+        village,
+        "i"
+      );
+    }
 
+    const addresses = await addressObj.find(query);
+    const totalCount = addressObj.count(query);
+    return res.jsonp({
+      status: STATUS_MESSAGES.success,
+      messageId: 200,
+      message: STATUS_MESSAGES.retrieveSuccess,
+      addresses,
+      totalCount,
+    });
+  } catch (error) {
+    return res.jsonp({
+      status: STATUS_MESSAGES.error,
+      messageId: 500,
+      message: error.message,
+    });
+  }
+}; 

@@ -77,7 +77,9 @@ exports.createCompany = async (req, res) => {
             email: value.email,
             companyCode: value.companyCode,
         }
+        
         const companyExists = await CompanyUtils.CompanyExists(companyQuery);
+
         if (companyExists) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,

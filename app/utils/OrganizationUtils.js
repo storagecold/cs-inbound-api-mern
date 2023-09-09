@@ -1,5 +1,5 @@
-const OrganizationObj = require('../models/Organization');
-const Joi = require('joi');
+const OrganizationObj = require("../models/Organization");
+const Joi = require("joi");
 
 module.exports = {
   OrganizationExists: async function (query) {
@@ -30,9 +30,7 @@ module.exports = {
         .required(),
       website: Joi.string(),
       address: Joi.object({
-        addressLine1: Joi.string()
-          .min(3)
-          .max(15),
+        addressLine1: Joi.string().min(3).max(15),
         addressLine2: Joi.string()
           .min(3)
           .max(15)
@@ -89,6 +87,5 @@ module.exports = {
     });
 
     return schema.validate(body);
-  }
-
-}
+  },
+};
