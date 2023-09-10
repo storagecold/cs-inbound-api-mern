@@ -38,21 +38,24 @@ exports.createCompany = async (req, res) => {
                 message: error.details[0].message,
             });
         }
+        let { name, email, companyCode, organization, address, createdBy } = value
+        name = globalModules.firstLetterCapital(name);
+
         let query = {
-            state: value.address.state,
-            district: value.address.district,
-            tehsil: value.address.tehsil,
-            village: value.address.village
+            state: address.state,
+            district: address.district,
+            tehsil: address.tehsil,
+            village: address.village
         }
-        const address = await addressUtils.existsAddress(query);
-        if (!address) {
+        const existAddress = await addressUtils.existsAddress(query);
+        if (!existAddress) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
                 messageId: 400,
                 message: STATUS_MESSAGES.addressNotFound
             });
         }
-        const admin = await adminUtils.isAdmin({ _id: value.createdBy, role: 'admin' })
+        const admin = await adminUtils.isAdmin({ _id: createdBy, role: 'admin' })
         if (!admin) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -61,9 +64,7 @@ exports.createCompany = async (req, res) => {
             });
         }
 
-        value.name = globalModules.firstLetterCapital(value.name);
-
-        const organizationExists = await OrganizationUtils.OrganizationExists({ _id: value.organization }, res);
+        const organizationExists = await OrganizationUtils.OrganizationExists({ _id: organization }, res);
 
         if (!organizationExists) {
             return res.jsonp({
@@ -72,11 +73,7 @@ exports.createCompany = async (req, res) => {
                 message: STATUS_MESSAGES.organizationNotFound
             });
         }
-        let companyQuery = {
-            name: value.name,
-            email: value.email,
-            companyCode: value.companyCode,
-        }
+        let companyQuery = { name, email, companyCode }
 
         const companyExists = await CompanyUtils.CompanyExists(companyQuery);
 
@@ -87,7 +84,6 @@ exports.createCompany = async (req, res) => {
                 message: STATUS_MESSAGES.companyExists,
             });
         }
-        value.mobile = '+91-' + value.mobile
         const newCompany = new CompanyObj(value);
         const savedCompany = await newCompany.save();
 
@@ -117,23 +113,25 @@ exports.updateCompany = async (req, res) => {
                 message: error.details[0].message,
             });
         }
+        let { name, _id, updatedBy, address } = value;
+
+        name = globalModules.firstLetterCapital(name);
+
         let query = {
-            state: value.address.state,
-            district: value.address.district,
-            tehsil: value.address.tehsil,
-            village: value.address.village
+            state: address.state,
+            district: address.district,
+            tehsil: address.tehsil,
+            village: address.village
         }
 
-        const address = await addressUtils.existsAddress(query);
-        if (!address) {
+        const existAddress = await addressUtils.existsAddress(query);
+        if (!existAddress) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
                 messageId: 400,
                 message: STATUS_MESSAGES.addressNotFound
             });
         }
-
-        let { name, _id, updatedBy } = value;
 
         const admin = await adminUtils.isAdmin({ _id: updatedBy, role: 'admin' });
         if (!admin) {
@@ -142,10 +140,6 @@ exports.updateCompany = async (req, res) => {
                 messageId: 400,
                 message: STATUS_MESSAGES.userNotAuthorizedUpdate
             });
-        }
-
-        if (name) {
-            name = globalModules.firstLetterCapital(name);
         }
 
         const companyExists = await CompanyObj.findOne({ _id });

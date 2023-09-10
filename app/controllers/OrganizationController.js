@@ -25,6 +25,8 @@ exports.createOrganization = async (req, res) => {
         if (error) {
             return res.status(400).json({ status: STATUS_MESSAGES.error, message: error.details[0].message });
         }
+        value.name = globalModules.firstLetterCapital(value.name);
+
         let query = {
             state: value.address.state,
             district: value.address.district,
@@ -47,7 +49,6 @@ exports.createOrganization = async (req, res) => {
                 message: STATUS_MESSAGES.userNotAuthorized
             });
         }
-        value.name = globalModules.firstLetterCapital(value.name);
         let inputData = {
             name: value.name,
             email: value.email,
@@ -60,7 +61,6 @@ exports.createOrganization = async (req, res) => {
                 message: STATUS_MESSAGES.organizationExists
             });
         }
-        value.mobile = '+91-' + value.mobile;
 
         const newOrganization = new organizationObj(value);
         const savedOrganization = await newOrganization.save();
@@ -91,6 +91,10 @@ exports.updateOrganization = async (req, res) => {
             tehsil: value.address.tehsil,
             village: value.address.village
         }
+
+        let {name,_id,updatedBy} = value;
+        name = globalModules.firstLetterCapital(value.name);
+
         const address = await addressUtils.existsAddress(query);
         if (!address) {
             return res.jsonp({
@@ -99,7 +103,6 @@ exports.updateOrganization = async (req, res) => {
                 message: STATUS_MESSAGES.addressNotFound
             });
         }
-        let {name,_id,updatedBy} = value;
 
         const admin = await adminUtils.isAdmin({ _id: updatedBy, role: 'admin' })
         if (!admin) {
@@ -109,10 +112,7 @@ exports.updateOrganization = async (req, res) => {
                 message: STATUS_MESSAGES.userNotAuthorizedUpdate
             });
         }
-        if (name) {
-            name = globalModules.firstLetterCapital(name);
-        }
-
+      
         const existingOrganization = await organizationObj.findById({_id});
         if (!existingOrganization) {
             return res.jsonp({

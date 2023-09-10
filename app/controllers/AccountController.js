@@ -8,7 +8,7 @@ const STATUS_MESSAGES = {
     success: 'success',
     error: 'error',
     accountNotFound: 'Account does not exist.',
-    addressNotFound: "The organization does not appear to exist. Admin, kindly consider adding a new address.",
+    addressNotFound: "The address does not exist. Admin, kindly consider adding a new address.",
     accountExists: 'Account with these details already exists.',
     saveSuccess: 'Account added successfully.',
     saveError: 'Error saving Account data.',
@@ -42,12 +42,18 @@ exports.createAccount = async (req, res) => {
                 message: STATUS_MESSAGES.companyNotFound,
             });
         }
+        let { firstName, lastName, careOfName, address } = value;
+
+        firstName = globalModules.firstLetterCapital(firstName);
+        lastName = globalModules.firstLetterCapital(lastName);
+
         let accountQuery = {
-            firstName: value.firstName,
-            careOfName: value.careOfName,
-            "address.village": value.address.village,
-            "address.tehsil": value.address.tehsil,
-            "address.district": value.address.district
+            firstName,
+            careOfName,
+            'address.village': address.village,
+            'address.tehsil': address.tehsil,
+            'address.district': address.district,
+            'address.state': address.state
         }
         const accountExists = await AccountUtils.AccountExists(accountQuery);
         if (accountExists) {
@@ -58,13 +64,13 @@ exports.createAccount = async (req, res) => {
             });
         };
         let query = {
-            state: value.address.state,
-            district: value.address.district,
-            tehsil: value.address.tehsil,
-            village: value.address.village
+            state: address.state,
+            district: address.district,
+            tehsil: address.tehsil,
+            village: address.village
         }
-        const address = await addressUtils.existsAddress(query);
-        if (!address) {
+        const existAddress = await addressUtils.existsAddress(query);
+        if (!existAddress) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
                 messageId: 400,
@@ -72,8 +78,6 @@ exports.createAccount = async (req, res) => {
             });
         };
 
-        value.firstName = globalModules.firstLetterCapital(value.firstName);
-        value.lastName = globalModules.firstLetterCapital(value.lastName);
 
 
         await AccountUtils.GetAccountNumber(value);
@@ -98,7 +102,7 @@ exports.createAccount = async (req, res) => {
 
 exports.updateAccount = async (req, res) => {
     try {
-        const { error, value } = Utils.AccountValidate(req.body);
+        const { error, value } = AccountUtils.AccountValidate(req.body);
         if (error) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -106,14 +110,27 @@ exports.updateAccount = async (req, res) => {
                 message: error.details[0].message
             });
         }
-        let query = {
-            state: value.address.state,
-            district: value.address.district,
-            tehsil: value.address.tehsil,
-            village: value.address.village
+        let { company, firstName, lastName, accountNumber, address } = value;
+
+        const companyExists = await CompanyUtils.CompanyExists({ _id: company });
+        if (!companyExists) {
+            return res.json({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.companyNotFound,
+            });
         }
-        const address = await addressUtils.existsAddress(query);
-        if (!address) {
+        firstName = globalModules.firstLetterCapital(firstName);
+        lastName = globalModules.firstLetterCapital(lastName);
+
+        let query = {
+            state: address.state,
+            district: address.district,
+            tehsil: address.tehsil,
+            village: address.village
+        }
+        const existAddress = await addressUtils.existsAddress(query);
+        if (!existAddress) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
                 messageId: 400,
@@ -121,12 +138,8 @@ exports.updateAccount = async (req, res) => {
             });
         };
 
-        const { firstName, accountNumber } = value;
 
-        if (firstName) {
-            firstName = globalModules.firstLetterCapital(firstName);
-        }
-        const existingAccount = await AccountObj.findOne({ accountNumber });
+        let existingAccount = await AccountObj.findOne({ accountNumber });
 
         if (!existingAccount) {
             return res.jsonp({
@@ -137,13 +150,13 @@ exports.updateAccount = async (req, res) => {
         }
 
         existingAccount.set(value);
-        const updatedAccount = await existingAccount.save();
+        let updatedAccount = await existingAccount.save();
 
         return res.jsonp({
             status: STATUS_MESSAGES.success,
             messageId: 200,
-            data: updatedAccount,
             message: STATUS_MESSAGES.updateSuccess,
+            data: updatedAccount,
         });
     } catch (error) {
         return res.jsonp({
@@ -256,7 +269,7 @@ exports.getAccountsList = async (req, res) => {
 exports.getAccountByNumber = async (req, res) => {
     try {
         const { accountNumber } = req.params;
-        const account = await AccountObj.findOne({ accountNumber });
+        const account = await AccountObj.findOne({ accountNumber, isDeleted: false });
 
         if (!account) {
             return res.jsonp({
@@ -283,7 +296,7 @@ exports.getAccountByNumber = async (req, res) => {
 
 exports.searchAccount = async (req, res) => {
     try {
-        const { search } = req.query;
+        const { search } = req.body;
         const trimmedSearch = search ? search.trim() : '';
 
         let query = {};
@@ -291,9 +304,7 @@ exports.searchAccount = async (req, res) => {
         if (trimmedSearch) {
             query = {
                 $or: [
-                    { accountNumber: trimmedSearch },
                     { firstName: { $regex: trimmedSearch, $options: 'i' } },
-                    { lastName: { $regex: trimmedSearch, $options: 'i' } },
                     { 'address.village': { $regex: trimmedSearch, $options: 'i' } }
                 ]
             };
