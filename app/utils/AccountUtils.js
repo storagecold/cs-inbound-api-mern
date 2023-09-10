@@ -23,7 +23,7 @@ module.exports = {
                 .min(3)
                 .max(15),
             addressLine2: Joi.string()
-            .alphanum().allow('')
+                .alphanum().allow('')
                 .min(3)
                 .max(15),
             village: Joi.string()
@@ -53,11 +53,11 @@ module.exports = {
             accName: Joi.string().required().trim().min(3).max(15).regex(/^[a-zA-Z\s]+$/),
             bankName: Joi.string().required().trim().min(3).max(15).regex(/^[a-zA-Z\s]+$/),
             branchName: Joi.string().required().trim().min(3).max(15).regex(/^[a-zA-Z\s]+$/),
-            ifscCode: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
+            ifscCode: Joi.string().pattern(/^[A-Z0-9]{11}$/).required(),
         });
 
         const schema = Joi.object({
-            company: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
+            company: Joi.string().pattern(/^[0-9a-zA-Z]{24}$/).required(),
             type: Joi.string().valid('kisan', 'staff', 'others'),
             accountNumber: Joi.number().integer(),
             firstName: Joi.string()
@@ -77,11 +77,9 @@ module.exports = {
                 .max(50)
                 .regex(/^[a-zA-Z\s]+$/),
             address: addressSchema,
-            mobile: Joi.string()
-                .regex(/^[0-9]{10}$/)
+            mobile: Joi.number()
                 .required(),
-            adharNo: Joi.string()
-                .regex(/^[0-9]{12}$/)
+            adharNo: Joi.number()
                 .required(),
             panNO: Joi.string().alphanum()
                 .min(3)

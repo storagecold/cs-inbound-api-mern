@@ -25,12 +25,12 @@ const AccountSchema = new Schema({
     addressLine2:String,
     village: String,
     tehsil: String,
-    distict: String,
+    district: String,
     state: String,
     pinCode: Number
   },
-  mobile: String,
-  adharNo: String,
+  mobile: Number,
+  adharNo: Number,
   panNO: String,
   email: String,
   bankDetails: [{

@@ -34,10 +34,8 @@ exports.createAddress = async (req, res) => {
         message: error.details[0].message,
       });
     }
-    const admin = await adminUtils.isAdmin({
-      _id: value.createdBy,
-      role: "admin",
-    });
+    let { createdBy, state, district, tehsil } = value;
+    const admin = await adminUtils.isAdmin({ _id: createdBy, role: "admin" });
     if (!admin) {
       return res.jsonp({
         status: STATUS_MESSAGES.error,
@@ -45,12 +43,7 @@ exports.createAddress = async (req, res) => {
         message: STATUS_MESSAGES.userNotAuthorized,
       });
     }
-    let query = {
-      state: value.state,
-      district: value.district,
-      tehsil: value.tehsil,
-      village: value.village,
-    };
+    let query = { state, district, tehsil, village };
     const foundAddress = await addressUtils.existsAddress(query);
     if (foundAddress) {
       return res.jsonp({
@@ -91,10 +84,7 @@ exports.updateAddress = async (req, res) => {
 
     let { _id, updatedBy } = value;
 
-    const admin = await adminUtils.isAdmin({
-      _id: updatedBy,
-      role: "admin",
-    });
+    const admin = await adminUtils.isAdmin({ _id: updatedBy, role: "admin" });
     if (!admin) {
       return res.jsonp({
         status: STATUS_MESSAGES.error,
@@ -229,13 +219,13 @@ exports.searchAddress = async (req, res) => {
     let query = {};
 
     if (trimmedSearch) {
-        query = {
-            $or: [
-                { district: { $regex: trimmedSearch, $options: 'i' } },
-                { tehsil: { $regex: trimmedSearch, $options: 'i' } },
-                { village: { $regex: trimmedSearch, $options: 'i' } },
-            ]
-        };
+      query = {
+        $or: [
+          { district: { $regex: trimmedSearch, $options: 'i' } },
+          { tehsil: { $regex: trimmedSearch, $options: 'i' } },
+          { village: { $regex: trimmedSearch, $options: 'i' } },
+        ]
+      };
     }
 
     const addresses = await addressObj.find(query);
