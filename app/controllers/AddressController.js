@@ -34,7 +34,7 @@ exports.createAddress = async (req, res) => {
         message: error.details[0].message,
       });
     }
-    let { createdBy, state, district, tehsil } = value;
+    let { createdBy, state, district, tehsil, village } = value;
     const admin = await adminUtils.isAdmin({ _id: createdBy, role: "admin" });
     if (!admin) {
       return res.jsonp({
