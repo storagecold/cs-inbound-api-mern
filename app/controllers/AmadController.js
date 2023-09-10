@@ -3,13 +3,13 @@ const AmadUtils = require('../utils/AmadUtils')
 const AccountUtils = require('../utils/AccountUtils')
 exports.createAmad = async (req, res) => {
     try {
-        const { error, value } = Utils.AmadValidate(req.body);
+        const { error, value } = AmadUtils.AmadValidate(req.body);
         if (error) {
             return res.status(400).json({ status: 'error', message: error.details[0].message });
         }
-        const accountExists = await AccountUtils.AccountExists({_id: value.account});
+        const accountExists = await AccountUtils.AccountExists({ _id: value.account });
 
-        if(!accountExists){
+        if (!accountExists) {
             if (accountExists) {
                 return res.json({
                     status: STATUS_MESSAGES.error,
@@ -18,44 +18,71 @@ exports.createAmad = async (req, res) => {
                 });
             }
         }
-       const amadExists= await AmadUtils.AmadExists(value,res);
+        const amadExists = await AmadUtils.AmadExists(value, res);
         if (amadExists) {
             return res.status(400).json({ status: 'error', message: 'Amad already exists.' });
         }
-       await AmadUtils.GetAmadNo(value);
+        await AmadUtils.GetAmadNo(value);
         const newAmad = new AmadObj(value);
         const savedAmad = await newAmad.save();
 
-      res.json({ status: "success", data: savedAmad });
+        res.json({ status: "success", data: savedAmad });
     } catch (error) {
-      res
-        .status(500)
-        .json({ status: "error", message: "Error saving amad data." });
+        res
+            .status(500)
+            .json({ status: "error", message: "Error saving amad data." });
     }
-    
+
 };
 
 exports.updateAmad = async (req, res) => {
     try {
-        const { amadNo } = req.body;
+        const { error, value } = AmadUtils.AmadValidate(req.body);
+        if (error) {
+            return res.status(400).json({ status: 'error', message: error.details[0].message });
+        }
+        const { account, amadNo } = value;
+        const accountExists = await AccountUtils.AccountExists({ _id: account });
+
+        if (!accountExists) {
+            if (accountExists) {
+                return res.json({
+                    status: STATUS_MESSAGES.error,
+                    messageId: 400,
+                    message: STATUS_MESSAGES.accountExists,
+                });
+            }
+        }
         const existingAmad = await AmadObj.findOne({ amadNo });
 
         if (!existingAmad) {
-            return res.status(404).json({ status: 'error', message: 'Amad not found.' });
+            return res.json({
+                status: STATUS_MESSAGES.error,
+                messageId: 404,
+                message: STATUS_MESSAGES.amadNotFound,
+            });
         }
-        existingAmad.set(req.body);
-        const updatedAmad = await existingAmad.save();
+        existingAmad.set(value);
+        await existingAmad.save();
 
-        res.json({ status: 'success', data: updatedAmad });
+        return res.json({
+            status: STATUS_MESSAGES.success,
+            messageId: 200,
+            message: STATUS_MESSAGES.amadUpdateSuccess,
+        })
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error updating amad data.' });
+        return res.json({
+            status: STATUS_MESSAGES.error,
+            messageId: 500,
+            message: STATUS_MESSAGES.amadUpdateError,
+        })
     }
 };
 
 exports.deleteAmad = async (req, res) => {
     try {
         const { amadNo } = req.params;
-        const amadToSoftDelete = await AmadObj.findOne({ amadNo },{isDeleted:1});
+        const amadToSoftDelete = await AmadObj.findOne({ amadNo }, { isDeleted: 1 });
 
         if (!amadToSoftDelete) {
             return res.status(404).json({ status: 'error', message: 'Amad not found.' });
@@ -87,7 +114,7 @@ exports.getAmadsList = async (req, res) => {
 exports.getAmadByNumber = async (req, res) => {
     try {
         const { amadNo } = req.params;
-        const amad = await AmadObj.findOne({ amadNo});
+        const amad = await AmadObj.findOne({ amadNo });
 
         if (!amad) {
             return res.status(404).json({ status: 'error', message: 'Amad not found.' });

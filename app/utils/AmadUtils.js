@@ -30,6 +30,7 @@ module.exports = {
             packets: Joi.number().integer().required(),
             kism: Joi.array().items(Joi.string()),
             year: Joi.number().integer(),
+            amadNo: Joi.number().integer(),
             chamberNo: Joi.number().integer().valid(1, 2, 3, 4).required(),
             grading: Joi.string().valid('CHATTA', 'GULLA', 'KIRRI', 'MIX'),
             isDeleted: Joi.boolean(),

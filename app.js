@@ -44,6 +44,7 @@ const companyRoutes = require("./app/routes/CompanyRoutes");
 const accountRoutes = require("./app/routes/AccountRoutes");
 const amadRoutes = require("./app/routes/AmadRoutes");
 const addressRoutes = require("./app/routes/AddressRoutes");
+const partyLedgerRoutes = require("./app/routes/PartyLedgerRoutes");
 
 app.use("/api/v1/", userAuthRoutes);
 app.use("/api/v1/", organizationRoutes);
@@ -51,6 +52,7 @@ app.use("/api/v1/", companyRoutes);
 app.use("/api/v1", accountRoutes);
 app.use("/api/v1", amadRoutes);
 app.use("/api/v1", addressRoutes);
+app.use("/api/v1", partyLedgerRoutes);
 
 const server = http.listen(process.env.PORT, function () {
   console.log(chalk.green("✓"), " App is running at", process.env.PORT);
