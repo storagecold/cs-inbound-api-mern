@@ -143,6 +143,7 @@ module.exports = {
           "West Bengal"
         )
         .required(),
+      _id: Joi.string().trim().alphanum().length(24),
       createdBy: Joi.string().trim().alphanum().length(24),
       updatedBy: Joi.string().trim().alphanum().length(24),
     }).options({ abortEarly: false });
