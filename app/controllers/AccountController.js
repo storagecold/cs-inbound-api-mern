@@ -8,6 +8,7 @@ const STATUS_MESSAGES = {
     success: 'success',
     error: 'error',
     accountNotFound: 'Account does not exist.',
+    companyNotFound: 'Company does not exist.',
     addressNotFound: "The address does not exist. Admin, kindly consider adding a new address.",
     accountExists: 'Account with these details already exists.',
     saveSuccess: 'Account added successfully.',
@@ -78,8 +79,6 @@ exports.createAccount = async (req, res) => {
             });
         };
 
-
-
         await AccountUtils.GetAccountNumber(value);
 
         const newAccount = new AccountObj(value);
@@ -110,7 +109,7 @@ exports.updateAccount = async (req, res) => {
                 message: error.details[0].message
             });
         }
-        let { company, firstName, lastName, accountNumber, address } = value;
+        let { company, firstName, lastName, _id, address } = value;
 
         const companyExists = await CompanyUtils.CompanyExists({ _id: company });
         if (!companyExists) {
@@ -138,8 +137,7 @@ exports.updateAccount = async (req, res) => {
             });
         };
 
-
-        let existingAccount = await AccountObj.findOne({ accountNumber });
+        let existingAccount = await AccountObj.findOne({ _id });
 
         if (!existingAccount) {
             return res.jsonp({
@@ -169,8 +167,8 @@ exports.updateAccount = async (req, res) => {
 
 exports.deleteAccount = async (req, res) => {
     try {
-        const { accountNumber } = req.params;
-        const accountToSoftDelete = await AccountObj.findOne({ accountNumber, isDeleted: false });
+        const accountId = req.params.id;
+        const accountToSoftDelete = await AccountObj.findOne({ _id: accountId, isDeleted: false });
 
         if (!accountToSoftDelete) {
             return res.jsonp({
@@ -182,7 +180,7 @@ exports.deleteAccount = async (req, res) => {
 
         accountToSoftDelete.isDeleted = true;
         accountToSoftDelete.deletedAt = new Date();
-        const data = await accountToSoftDelete.save();
+        await accountToSoftDelete.save();
 
         return res.jsonp({
             status: STATUS_MESSAGES.success,
@@ -200,8 +198,8 @@ exports.deleteAccount = async (req, res) => {
 };
 exports.restoreAccount = async (req, res) => {
     try {
-        const { accountNumber } = req.params;
-        const accountToRestore = await AccountObj.findOne({ accountNumber, isDeleted: true });
+        const accountId = req.params.id;
+        const accountToRestore = await AccountObj.findOne({ _id: accountId, isDeleted: true });
 
         if (!accountToRestore) {
             return res.jsonp({
@@ -268,8 +266,8 @@ exports.getAccountsList = async (req, res) => {
 
 exports.getAccountByNumber = async (req, res) => {
     try {
-        const { accountNumber } = req.params;
-        const account = await AccountObj.findOne({ accountNumber, isDeleted: false });
+        const accountId = req.params;
+        const account = await AccountObj.findOne({ _id: accountId, isDeleted: false });
 
         if (!account) {
             return res.jsonp({

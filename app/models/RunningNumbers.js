@@ -6,6 +6,8 @@ const RunningNumberSchema = new Schema({
     accountNumberValue: {type:Number,default:1000},
     amadNumberKey: String,
     amadNumberValue: {type:Number,default:100},
+    savedYearKey: String,
+    savedYearValue: {type:Number,default:1975},
 
 }, { timestamps: true });
 

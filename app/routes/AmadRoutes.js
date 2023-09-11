@@ -6,8 +6,8 @@ const AmadController = require("../controllers/AmadController");
 
 router.post('/amads', checkAuth, AmadController.createAmad);
 router.put('/amads', checkAuth, AmadController.updateAmad);
-router.delete('/amads/:amadNo', checkAuth,AmadController.deleteAmad);
-router.get('/amads/:amadNo', checkAuth, AmadController.getAmadByNumber);
+router.delete('/amads', checkAuth,AmadController.deleteAmad);
+router.get('/amads/:id', checkAuth, AmadController.getAmadById);
 router.get('/amads', checkAuth, AmadController.getAmadsList);
 router.post('/amads/search', checkAuth, AmadController.searchAmad);
 

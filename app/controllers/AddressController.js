@@ -189,15 +189,19 @@ exports.deleteAddress = async (req, res) => {
         message: STATUS_MESSAGES.userNotAuthorizedDelete,
       });
     }
+    const addressToSoftDelete = await addressObj.findOne({ _id, isDeleted: false });
 
-    const addressToDelete = await addressObj.deleteOne({ _id });
-    if (addressToDelete.deletedCount == 0) {
+    if (!addressToSoftDelete) {
       return res.jsonp({
-        status: STATUS_MESSAGES.success,
-        messageId: 200,
+        status: STATUS_MESSAGES.error,
+        messageId: 404,
         message: STATUS_MESSAGES.addressNotFound,
       });
     }
+    addressToSoftDelete.isDeleted = true;
+    addressToSoftDelete.deletedAt = new Date();
+    await addressToSoftDelete.save();
+
     return res.jsonp({
       status: STATUS_MESSAGES.success,
       messageId: 200,
@@ -219,13 +223,7 @@ exports.searchAddress = async (req, res) => {
     let query = {};
 
     if (trimmedSearch) {
-      query = {
-        $or: [
-          { district: { $regex: trimmedSearch, $options: 'i' } },
-          { tehsil: { $regex: trimmedSearch, $options: 'i' } },
-          { village: { $regex: trimmedSearch, $options: 'i' } },
-        ]
-      };
+      query = { village: { $regex: trimmedSearch, $options: 'i' } };
     }
 
     const addresses = await addressObj.find(query);
