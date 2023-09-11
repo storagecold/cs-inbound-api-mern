@@ -1,6 +1,27 @@
 const AmadObj = require('../models/Amad');
 const AmadUtils = require('../utils/AmadUtils')
 const AccountUtils = require('../utils/AccountUtils')
+
+const STATUS_MESSAGES = {
+    success: 'success',
+    error: 'error',
+    amadNotFound: 'Amad does not exist.',
+    accountExists: 'Amad does not exist.',
+    companyNotFound: 'Company does not exist.',
+    addressNotFound: "The address does not exist. Admin, kindly consider adding a new address.",
+    amadExists: 'Amad with these details already exists.',
+    saveSuccess: 'Amad added successfully.',
+    saveError: 'Error saving Amad data.',
+    updateSuccess: 'Amad updated successfully.',
+    retrieveSuccess: 'Amad retrieved successfully.',
+    updateError: 'Error updating Amad data.',
+    fetchError: 'Error fetching Amad.',
+    deleteError: 'Error deleting Amad.',
+    recordDeleted: 'Record deleted successfully.',
+    restoreSuccess: 'Amad restored successfully.',
+    restoreError: 'Error restoring Amad.',
+};
+
 exports.createAmad = async (req, res) => {
     try {
         const { error, value } = AmadUtils.AmadValidate(req.body);
@@ -18,19 +39,22 @@ exports.createAmad = async (req, res) => {
                 });
             }
         }
-        const amadExists = await AmadUtils.AmadExists(value, res);
-        if (amadExists) {
-            return res.status(400).json({ status: 'error', message: 'Amad already exists.' });
-        }
         await AmadUtils.GetAmadNo(value);
         const newAmad = new AmadObj(value);
         const savedAmad = await newAmad.save();
 
-        res.json({ status: "success", data: savedAmad });
+        return res.json({
+            status: STATUS_MESSAGES.success,
+            messageId: 200,
+            message: STATUS_MESSAGES.saveSuccess,
+            data: savedAmad
+        });
     } catch (error) {
-        res
-            .status(500)
-            .json({ status: "error", message: "Error saving amad data." });
+        return res.json({
+            status: STATUS_MESSAGES.error,
+            messageId: 500,
+            message: STATUS_MESSAGES.saveError,
+        });
     }
 
 };
@@ -41,19 +65,17 @@ exports.updateAmad = async (req, res) => {
         if (error) {
             return res.status(400).json({ status: 'error', message: error.details[0].message });
         }
-        const { account, amadNo } = value;
+        const { account, _id } = value;
         const accountExists = await AccountUtils.AccountExists({ _id: account });
 
         if (!accountExists) {
-            if (accountExists) {
-                return res.json({
-                    status: STATUS_MESSAGES.error,
-                    messageId: 400,
-                    message: STATUS_MESSAGES.accountExists,
-                });
-            }
+            return res.json({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.accountExists,
+            });
         }
-        const existingAmad = await AmadObj.findOne({ amadNo });
+        const existingAmad = await AmadObj.findOne({ _id });
 
         if (!existingAmad) {
             return res.json({
@@ -68,61 +90,95 @@ exports.updateAmad = async (req, res) => {
         return res.json({
             status: STATUS_MESSAGES.success,
             messageId: 200,
-            message: STATUS_MESSAGES.amadUpdateSuccess,
+            message: STATUS_MESSAGES.updateSuccess,
         })
     } catch (error) {
         return res.json({
             status: STATUS_MESSAGES.error,
             messageId: 500,
-            message: STATUS_MESSAGES.amadUpdateError,
+            message: STATUS_MESSAGES.updateError,
         })
     }
 };
 
 exports.deleteAmad = async (req, res) => {
     try {
-        const { amadNo } = req.params;
-        const amadToSoftDelete = await AmadObj.findOne({ amadNo }, { isDeleted: 1 });
+        const { _id } = req.body;
+        const amadToSoftDelete = await AmadObj.findOne({ _id, isDeleted: false });
 
         if (!amadToSoftDelete) {
-            return res.status(404).json({ status: 'error', message: 'Amad not found.' });
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 404,
+                message: STATUS_MESSAGES.amadNotFound
+            });
         }
 
-        // Mark the account as deleted
         amadToSoftDelete.isDeleted = true;
         amadToSoftDelete.deletedAt = new Date();
         await amadToSoftDelete.save();
 
-        res.json({ status: 'success', message: 'Amad soft-deleted successfully.' });
+        return res.jsonp({
+            status: STATUS_MESSAGES.success,
+            messageId: 200,
+            message: STATUS_MESSAGES.recordDeleted
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error soft-deleting amad.' });
+        return res.jsonp({
+            status: STATUS_MESSAGES.error,
+            messageId: 500,
+            message: STATUS_MESSAGES.deleteError
+        });
     }
 };
 
 exports.getAmadsList = async (req, res) => {
     try {
-        const amadsList = await AmadObj.find({ isDeleted: false }).exec();
-        ;
+        const amadsList = await AmadObj.find({ isDeleted: false });
+
         const totalCount = await AmadObj.countDocuments();
 
-        res.json({ status: 'success', data: amadsList, totalCount });
+        return res.jsonp({
+            status: STATUS_MESSAGES.success,
+            messageId: 200,
+            message: STATUS_MESSAGES.retriceSuccess,
+            data: amadsList,
+            totalCount
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error fetching amads list.' });
+        return res.jsonp({
+            status: STATUS_MESSAGES.error,
+            messageId: 500,
+            message: STATUS_MESSAGES.deleteError
+        });
     }
 };
 
-exports.getAmadByNumber = async (req, res) => {
+exports.getAmadById = async (req, res) => {
     try {
-        const { amadNo } = req.params;
-        const amad = await AmadObj.findOne({ amadNo });
+        const amadId = req.params.id;
+        const amad = await AmadObj.findOne({ _id: amadId });
 
         if (!amad) {
-            return res.status(404).json({ status: 'error', message: 'Amad not found.' });
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 404,
+                message: STATUS_MESSAGES.amadNotFound
+            });
         }
 
-        res.json({ status: 'success', data: amad });
+        return res.jsonp({
+            status: STATUS_MESSAGES.success,
+            messageId: 200,
+            message: STATUS_MESSAGES.retrieveSuccess,
+            data: amad
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error fetching amad.' });
+        return res.jsonp({
+            status: STATUS_MESSAGES.error,
+            messageId: 500,
+            message: STATUS_MESSAGES.fetchError
+        });
     }
 };
 
@@ -147,9 +203,19 @@ exports.searchAmad = async (req, res) => {
         const amadsList = await AmadObj.find(query);
         const totalCount = await AmadObj.countDocuments(query);
 
-        res.json({ status: 'success', data: amadsList, totalCount });
+        return res.jsonp({
+            status: STATUS_MESSAGES.success,
+            messageId: 200,
+            message: STATUS_MESSAGES.retrieveSuccess,
+            data: amadsList,
+            totalCount
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Error fetching amads list.' });
+        return res.jsonp({
+            status: STATUS_MESSAGES.error,
+            messageId: 500,
+            message: STATUS_MESSAGES.fetchError
+        });
     }
 };
 

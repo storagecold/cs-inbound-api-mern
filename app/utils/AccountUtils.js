@@ -3,7 +3,7 @@ const RunningNumberObj = require('../models/RunningNumbers');
 const Joi = require('joi');
 
 module.exports = {
-    AccountExists: async function (query) {
+    AccountExists: async function ( query) {
         return await AccountObj.findOne(query);
     },
 
@@ -89,7 +89,8 @@ module.exports = {
             isDeleted: Joi.boolean(),
             deletedAt: Joi.date().allow(null),
             createdBy: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).allow(null),
-            updatedBy: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).allow(null)
+            updatedBy: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).allow(null),
+            _id: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).allow(null)
         });
 
 

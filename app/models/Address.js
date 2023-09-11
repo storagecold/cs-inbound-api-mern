@@ -4,6 +4,8 @@ const addressSchema = new mongoose.Schema({
   tehsil: String,
   district: String,
   state: String,
+  isDeleted: { type: Boolean, default: false },
+  deletedAt: { type: Date, default: null },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

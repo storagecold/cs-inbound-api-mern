@@ -21,7 +21,7 @@ const amadSchema = new mongoose.Schema(
       type: Number,
       required: true
     },
-    kism: [{ type: String }],
+    kism: [{ type: String,required: true,index:true }],
     lotNo: {
       type: String,
     },
