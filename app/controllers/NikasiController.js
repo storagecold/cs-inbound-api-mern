@@ -1,55 +1,82 @@
 const AmadObj = require('../models/Amad');
-const AmadUtils = require('../utils/AmadUtils')
-const AccountUtils = require('../utils/AccountUtils')
-
+const AccountUtils = require('../utils/AccountUtils');
+const NikasiUtils = require('../utils/NikasiUtils');
+const AmadUtils = require('../utils/AmadUtils');
+const NikasiObj = require('../models/Nikasi');
 const STATUS_MESSAGES = {
     success: 'success',
     error: 'error',
-    amadNotFound: 'Amad does not exist.',
-    accountExists: 'Amad does not exist.',
+    mikasiNotFound: 'Mikasi does not exist.', // Updated from 'amadNotFound'
+    accountExists: 'Mikasi does not exist.', // Updated from 'accountExists'
     companyNotFound: 'Company does not exist.',
     addressNotFound: "The address does not exist. Admin, kindly consider adding a new address.",
-    amadExists: 'Amad with these details already exists.',
-    saveSuccess: 'Amad added successfully.',
-    saveError: 'Error saving Amad data.',
-    updateSuccess: 'Amad updated successfully.',
-    retrieveSuccess: 'Amad retrieved successfully.',
-    updateError: 'Error updating Amad data.',
-    fetchError: 'Error fetching Amad.',
-    deleteError: 'Error deleting Amad.',
+    mikasiExists: 'Mikasi with these details already exists.', // Updated from 'amadExists'
+    saveSuccess: 'Mikasi added successfully.', // Updated from 'saveSuccess'
+    saveError: 'Error saving Mikasi data.', // Updated from 'saveError'
+    updateSuccess: 'Mikasi updated successfully.', // Updated from 'updateSuccess'
+    retrieveSuccess: 'Mikasi retrieved successfully.', // Updated from 'retrieveSuccess'
+    updateError: 'Error updating Mikasi data.', // Updated from 'updateError'
+    fetchError: 'Error fetching Nikasi.',
+    deleteError: 'Error deleting Nikasi.',
     recordDeleted: 'Record deleted successfully.',
-    restoreSuccess: 'Amad restored successfully.',
-    restoreError: 'Error restoring Amad.',
+    restoreSuccess: 'Nikasi restored successfully.',
+    restoreError: 'Error restoring Mikasi.',
+    insufficientBalance: "Not sufficeient balance"
 };
 
-exports.createAmad = async (req, res) => {
+exports.createNikasi = async (req, res) => {
     try {
-        const { error, value } = AmadUtils.AmadValidate(req.body);
+        const { error, value } = NikasiUtils.nikasiValidate(req.body);
+
         if (error) {
             return res.status(400).json({ status: 'error', message: error.details[0].message });
         }
+
         const accountExists = await AccountUtils.AccountExists({ _id: value.account });
 
         if (!accountExists) {
-            if (accountExists) {
-                return res.json({
-                    status: STATUS_MESSAGES.error,
-                    messageId: 400,
-                    message: STATUS_MESSAGES.accountExists,
-                });
-            }
+            return res.json({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.accountExists,
+            });
         }
-        await AmadUtils.GetAmadNo(value);
-        await AmadUtils.GetamadSrNo(value);
-        value.balancePkt = value.amadPkt;
-        const newAmad = new AmadObj(value);
-        const savedAmad = await newAmad.save();
+
+        const amad = await AmadObj.findOne({ _id: value.amad }, { nikasiPktSum: 1, balancePkt: 1 });
+
+        if (!amad) {
+            return res.json({
+                status: STATUS_MESSAGES.error,
+                messageId: 404,
+                message: STATUS_MESSAGES.amadNotFound,
+            });
+        }
+
+        if (amad.balancePkt < value.nikasiPkt || amad.balancePkt === 0) {
+            return res.json({
+                status: STATUS_MESSAGES.error,
+                messageId: 404,
+                message: STATUS_MESSAGES.insufficientBalance,
+            });
+        }
+        let amadData = {
+            balancePkt: amad.balancePkt - value.nikasiPkt,
+            nikasiPktSum: amad.nikasiPktSum + value.nikasiPkt
+        }
+
+        amad.set(amadData)
+        await amad.save();
+
+        await NikasiUtils.GetNikasiSrNo(value);
+
+        const nikasi = new NikasiObj(value);
+        const data = await nikasi.save();
 
         return res.json({
             status: STATUS_MESSAGES.success,
             messageId: 200,
             message: STATUS_MESSAGES.saveSuccess,
-            data: savedAmad
+            data,
         });
     } catch (error) {
         return res.json({
@@ -58,7 +85,6 @@ exports.createAmad = async (req, res) => {
             message: STATUS_MESSAGES.saveError,
         });
     }
-
 };
 
 exports.updateAmad = async (req, res) => {

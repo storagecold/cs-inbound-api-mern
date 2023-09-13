@@ -45,6 +45,7 @@ const accountRoutes = require("./app/routes/AccountRoutes");
 const amadRoutes = require("./app/routes/AmadRoutes");
 const addressRoutes = require("./app/routes/AddressRoutes");
 const partyLedgerRoutes = require("./app/routes/PartyLedgerRoutes");
+const nikasiRoutes = require("./app/routes/NikasiRoutes");
 
 app.use("/api/v1/", userAuthRoutes);
 app.use("/api/v1/", organizationRoutes);
@@ -53,6 +54,7 @@ app.use("/api/v1", accountRoutes);
 app.use("/api/v1", amadRoutes);
 app.use("/api/v1", addressRoutes);
 app.use("/api/v1", partyLedgerRoutes);
+app.use("/api/v1", nikasiRoutes);
 
 const server = http.listen(process.env.PORT, function () {
   console.log(chalk.green("✓"), " App is running at", process.env.PORT);

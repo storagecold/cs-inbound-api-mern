@@ -8,7 +8,7 @@ router.post('/accounts', checkAuth, AccountController.createAccount);
 router.put('/accounts', checkAuth, AccountController.updateAccount);
 router.delete('/accounts/:id', checkAuth, AccountController.deleteAccount);
 router.patch('/accounts/:id', checkAuth, AccountController.restoreAccount);
-router.get('/accounts/:id', checkAuth, AccountController.getAccountByNumber);
+router.get('/accounts/:id', checkAuth, AccountController.getAccountById);
 router.get('/accounts/:companyId/:page/:perPage', checkAuth, AccountController.getAccountsList);
 router.post('/accounts/search', checkAuth, AccountController.searchAccount);
 

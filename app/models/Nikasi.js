@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const amadSchema = new mongoose.Schema(
+const nikasiSchema = new mongoose.Schema(
   {
     company: {
       type: mongoose.Schema.Types.ObjectId,
@@ -12,34 +12,17 @@ const amadSchema = new mongoose.Schema(
       ref: 'Account',
       index: true
     },
-    amadSrNo: {
+    amad: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Amad',
+      index: true
+    },
+    nikasiSrNo: {
       type: Number,
       unique: true,
       index: true
     },
-    amadNo: {
-      type: Number,
-      unique: true,
-      index: true
-    },
-    amadPkt: {
-      type: Number,
-      index: true
-    },
-    nikasiPktSum: {
-      type: Number,
-      default:0,
-      index: true
-    },
-    balancePkt: {
-      type: Number,
-      index: true
-    },
-    kism: { type: String, required: true, index: true },
-    lotNo: {
-      type: String,
-    },
-    year: {
+    nikasiPkt: {
       type: Number,
       index: true
     },
@@ -55,7 +38,10 @@ const amadSchema = new mongoose.Schema(
       enum: ["CHATTA", "GULLA", "KIRRI", "MIX"],
       index: true,
     },
-
+    year: {
+      type: Number,
+      index: true
+    },
     isDeleted: {
       type: Boolean,
       default: false
@@ -76,13 +62,12 @@ const amadSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-amadSchema.pre('save', function (next) {
+nikasiSchema.pre('save', function (next) {
   const currentDate = new Date();
   this.year = currentDate.getFullYear();
-  this.lotNo = `${this.amadNo}/${this.amadPkt}`;
   next();
 });
 
-const AmadObj = mongoose.model("Amad", amadSchema);
+const NikasiObj = mongoose.model("Nikasi", nikasiSchema);
 
-module.exports = AmadObj;
+module.exports = NikasiObj;

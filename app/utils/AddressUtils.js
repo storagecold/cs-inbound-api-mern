@@ -6,7 +6,7 @@ module.exports = {
     const address = await AddressObj.findOne(query);
     return address;
   },
-  validateAddress: async function (body) {
+  validateAddress: function (body) {
     const alphaSpaceRegex = /^[A-Za-z ]+$/;
 
     const addressSchema = Joi.object({
