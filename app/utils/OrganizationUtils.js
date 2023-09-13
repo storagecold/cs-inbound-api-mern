@@ -28,7 +28,12 @@ module.exports = {
         .max(15)
         .pattern(/^[a-zA-Z\s]+$/)
         .required(),
-      website: Joi.string(),
+      website: Joi.string()
+    .uri({ scheme: ['http', 'https'] })
+    .trim()
+    .max(255)
+    .required()
+    .message('Invalid website format. It should be a valid URL starting with http or https.'),
       address: Joi.object({
         addressLine1: Joi.string().min(3).max(15),
         addressLine2: Joi.string()
