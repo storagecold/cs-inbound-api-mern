@@ -1,54 +1,39 @@
-const Joi = require('joi');
-const AmadObj = require('../models/Amad');
 const NikasiObj = require('../models/Nikasi');
 const RunningNumberObj = require('../models/RunningNumbers');
+const Joi = require('joi');
 
 module.exports = {
-    AmadExists: async function (query) {
+    NikasiExists: async function (query) {
 
-        return await AmadObj.findOne(query);
+        return await NikasiObj.findOne(query);
     },
-    GetAmadNo: async (value) => {
-        const query = { amadNumberKey: "amadNumberValue" };
+
+    GetSerialNo: async (value) => {
+        const query = { nikasiSrNoKey: "nikasiSrNoValue" };
         const currentYear = new Date().getFullYear();
         const savedYearDoc = await RunningNumberObj.findOne({ savedYearKey: "savedYearValue" });
         const savedYear = savedYearDoc ? savedYearDoc.savedYearValue : null;
 
         if (!savedYear || savedYear < currentYear) {
-            await RunningNumberObj.findOneAndUpdate(query, { amadNumberValue: 0 });
+            await RunningNumberObj.findOneAndUpdate(query, { nikasiSrNoValue: 0 });
         }
 
-        const update = { $inc: { amadNumberValue: 1 } };
+        const update = { $inc: { nikasiSrNoValue: 1 } };
         const options = { new: true, upsert: true };
 
         const runningNumber = await RunningNumberObj.findOneAndUpdate(query, update, options).exec();
 
-        value.amadNo = runningNumber ? runningNumber.amadNumberValue : 999;
+        value.serialNo = runningNumber ? runningNumber.nikasiSrNoValue : 999;
     },
-    GetSerialNumber: async (value) => {
-        const query = { amadSrNoKey: "amadSrNoValue" };
-        const currentYear = new Date().getFullYear();
-        const savedYearDoc = await RunningNumberObj.findOne({ savedYearKey: "savedYearValue" });
-        const savedYear = savedYearDoc ? savedYearDoc.savedYearValue : null;
 
-        if (!savedYear || savedYear < currentYear) {
-            await RunningNumberObj.findOneAndUpdate(query, { amadSrNoValue: 0 });
-        }
-        const update = { $inc: { amadSrNoValue: 1 } };
-        const options = { new: true, upsert: true };
-
-        const runningNumber = await RunningNumberObj.findOneAndUpdate(query, update, options).exec();
-
-        value.serialNo = runningNumber ? runningNumber.amadSrNoValue : 99999
-    },
-   ValidateAmad : function (body) {
+    ValidateNikasi: function (body) {
         const schema = Joi.object({
             company: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
             account: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
+            amad: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
+            amadNo: Joi.number().integer().required(),
             packet: Joi.number().integer().required(),
             kism: Joi.string().valid('3797', 'LOKAR', 'kHIYATI', '302').required(),
-            year: Joi.number().integer(),
-            amadNo: Joi.number().integer(),
             roomNo: Joi.number().integer().valid(1, 2, 3, 4).required(),
             grading: Joi.string().valid('CHHATTA', 'GULLA', 'KIRRI', 'MIX'),
             isDeleted: Joi.boolean(),

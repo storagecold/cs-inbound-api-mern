@@ -28,9 +28,9 @@ exports.getprtyLedger = async (req, res) => {
             })
         }
         const data = {
-            amad: totalPacket,
-            nikasi: 0,
-            balance: totalPacket
+            PacketAmad: totalPacket,
+            PacketNikasi: 0,
+            packetBalance: totalPacket
 
         }
         return res.jsonp({

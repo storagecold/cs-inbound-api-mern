@@ -264,9 +264,9 @@ exports.getAccountsList = async (req, res) => {
     }
 };
 
-exports.getAccountByNumber = async (req, res) => {
+exports.getAccountById = async (req, res) => {
     try {
-        const accountId = req.params;
+        const accountId = req.params.id;
         const account = await AccountObj.findOne({ _id: accountId, isDeleted: false });
 
         if (!account) {

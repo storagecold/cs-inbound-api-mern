@@ -324,7 +324,7 @@ exports.searchCompany = async (req, res) => {
             status: STATUS_MESSAGES.success,
             messageId: 200,
             message: STATUS_MESSAGES.retrieveSuccess,
-            dat: companies,
+            data: companies,
             totalRecords: totalCount
         });
     } catch (error) {
