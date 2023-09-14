@@ -143,7 +143,7 @@ exports.updateNikasi = async (req, res) => {
             }
         }
         if (value.packet < existingNikasi.packet) {
-            if (amad.balance < value.packet || value.packet < 0) {
+            if (amad.balance > value.packet || value.packet < 0) {
                 return res.json({
                     status: STATUS_MESSAGES.error,
                     messageId: 404,
