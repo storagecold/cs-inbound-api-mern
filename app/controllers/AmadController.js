@@ -44,6 +44,7 @@ exports.createAmad = async (req, res) => {
         await AmadUtils.GetAmadNo(value);
         await AmadUtils.GetSerialNumber(value);
         value.balance = value.packet;
+        value.lotNo = `${value.amadNo}/${value.packet}`;
         const newAmad = new AmadObj(value);
         const savedAmad = await newAmad.save();
 

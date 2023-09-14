@@ -79,7 +79,6 @@ const amadSchema = new mongoose.Schema(
 amadSchema.pre('save', function (next) {
   const currentDate = new Date();
   this.year = currentDate.getFullYear();
-  this.lotNo = `${this.amadNo}/${this.packet}`;
   next();
 });
 
