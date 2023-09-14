@@ -17,16 +17,19 @@ const nikasiSchema = new mongoose.Schema(
       ref: 'Amad',
       index: true
     },
-    nikasiSrNo: {
+    amadNo: {
+      type: Number,
+    },
+    serialNo: {
       type: Number,
       unique: true,
       index: true
     },
-    nikasiPkt: {
+    packet: {
       type: Number,
       index: true
     },
-    chamberNo: {
+    roomNo: {
       type: Number,
       required: true,
       index: true,
@@ -35,7 +38,7 @@ const nikasiSchema = new mongoose.Schema(
     },
     grading: {
       type: String,
-      enum: ["CHATTA", "GULLA", "KIRRI", "MIX"],
+      enum: ["CHHATTA", "GULLA", "KIRRI", "MIX"],
       index: true,
     },
     year: {

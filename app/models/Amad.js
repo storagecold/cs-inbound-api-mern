@@ -12,7 +12,7 @@ const amadSchema = new mongoose.Schema(
       ref: 'Account',
       index: true
     },
-    amadSrNo: {
+    serialNo: {
       type: Number,
       unique: true,
       index: true
@@ -22,16 +22,16 @@ const amadSchema = new mongoose.Schema(
       unique: true,
       index: true
     },
-    amadPkt: {
+    packet: {
       type: Number,
       index: true
     },
-    nikasiPktSum: {
+    nikasi: {
       type: Number,
       default:0,
       index: true
     },
-    balancePkt: {
+    balance: {
       type: Number,
       index: true
     },
@@ -43,7 +43,7 @@ const amadSchema = new mongoose.Schema(
       type: Number,
       index: true
     },
-    chamberNo: {
+    roomNo: {
       type: Number,
       required: true,
       index: true,
@@ -52,7 +52,7 @@ const amadSchema = new mongoose.Schema(
     },
     grading: {
       type: String,
-      enum: ["CHATTA", "GULLA", "KIRRI", "MIX"],
+      enum: ["CHHATTA", "GULLA", "KIRRI", "MIX"],
       index: true,
     },
 
@@ -79,7 +79,7 @@ const amadSchema = new mongoose.Schema(
 amadSchema.pre('save', function (next) {
   const currentDate = new Date();
   this.year = currentDate.getFullYear();
-  this.lotNo = `${this.amadNo}/${this.amadPkt}`;
+  this.lotNo = `${this.amadNo}/${this.packet}`;
   next();
 });
 

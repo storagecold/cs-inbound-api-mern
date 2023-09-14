@@ -5,10 +5,12 @@ const checkAuth = require("../middleware/check-auth");
 const NikasiController = require("../controllers/NikasiController");
 
 router.post('/nikasi', checkAuth, NikasiController.createNikasi);
-// router.put('/amads', checkAuth, AmadController.updateAmad);
-// router.delete('/amads', checkAuth,AmadController.deleteAmad);
-// router.get('/amads/:id', checkAuth, AmadController.getAmadById);
-// router.get('/amads', checkAuth, AmadController.getAmadsList);
-// router.post('/amads/search', checkAuth, AmadController.searchAmad);
+router.put('/nikasi', checkAuth, NikasiController.updateNikasi);
+router.delete('/nikasi', checkAuth, NikasiController.deleteNikasi);
+router.get('/nikasi/:id', checkAuth, NikasiController.NikasiById);
+router.get('/nikasi', checkAuth, NikasiController.NikasiList);
+router.get('/nikasi/list/:accountId/', checkAuth, NikasiController.NikasiByAccount);
+router.get('/nikasi/list/:accountId/:amadId', checkAuth, NikasiController.NikasiByAmad);
+router.post('/nikasi/search', checkAuth, NikasiController.searchNikasi);
 
 module.exports = router;

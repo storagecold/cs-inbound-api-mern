@@ -25,7 +25,7 @@ module.exports = {
 
         value.amadNo = runningNumber ? runningNumber.amadNumberValue : 999;
     },
-    GetamadSrNo: async (value) => {
+    GetSerialNumber: async (value) => {
         const query = { amadSrNoKey: "amadSrNoValue" };
         const currentYear = new Date().getFullYear();
         const savedYearDoc = await RunningNumberObj.findOne({ savedYearKey: "savedYearValue" });
@@ -39,18 +39,18 @@ module.exports = {
 
         const runningNumber = await RunningNumberObj.findOneAndUpdate(query, update, options).exec();
 
-        value.amadSrNo = runningNumber ? runningNumber.amadSrNoValue : 99999
+        value.serialNo = runningNumber ? runningNumber.amadSrNoValue : 99999
     },
-    AmadValidate: function (body) {
+   ValidateAmad : function (body) {
         const schema = Joi.object({
             company: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
             account: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
-            amadPkt: Joi.number().integer().required(),
+            packet: Joi.number().integer().required(),
             kism: Joi.string().valid('3797', 'LOKAR', 'kHIYATI', '302').required(),
             year: Joi.number().integer(),
             amadNo: Joi.number().integer(),
-            chamberNo: Joi.number().integer().valid(1, 2, 3, 4).required(),
-            grading: Joi.string().valid('CHATTA', 'GULLA', 'KIRRI', 'MIX'),
+            roomNo: Joi.number().integer().valid(1, 2, 3, 4).required(),
+            grading: Joi.string().valid('CHHATTA', 'GULLA', 'KIRRI', 'MIX'),
             isDeleted: Joi.boolean(),
             deletedAt: Joi.date().allow(null),
             createdBy: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),

@@ -1,7 +1,7 @@
 const AmadObj = require('../models/Amad');
 const AmadUtils = require('../utils/AmadUtils')
 const AccountUtils = require('../utils/AccountUtils')
-
+const adminUtils = require('../utils/AdminUtils')
 const STATUS_MESSAGES = {
     success: 'success',
     error: 'error',
@@ -20,11 +20,13 @@ const STATUS_MESSAGES = {
     recordDeleted: 'Record deleted successfully.',
     restoreSuccess: 'Amad restored successfully.',
     restoreError: 'Error restoring Amad.',
+    userNotAuthorizedUpdate: "Only Admin can update Nikasi.",
+    userNotAuthorizedDelete: "Only Admin can delete Nikasi."
 };
 
 exports.createAmad = async (req, res) => {
     try {
-        const { error, value } = AmadUtils.AmadValidate(req.body);
+        const { error, value } = AmadUtils.ValidateAmad(req.body);
         if (error) {
             return res.status(400).json({ status: 'error', message: error.details[0].message });
         }
@@ -40,8 +42,8 @@ exports.createAmad = async (req, res) => {
             }
         }
         await AmadUtils.GetAmadNo(value);
-        await AmadUtils.GetamadSrNo(value);
-        value.balancePkt = value.amadPkt;
+        await AmadUtils.GetSerialNumber(value);
+        value.balance = value.packet;
         const newAmad = new AmadObj(value);
         const savedAmad = await newAmad.save();
 
@@ -63,11 +65,19 @@ exports.createAmad = async (req, res) => {
 
 exports.updateAmad = async (req, res) => {
     try {
-        const { error, value } = AmadUtils.AmadValidate(req.body);
+        const { error, value } = AmadUtils.ValidateAmad(req.body);
         if (error) {
             return res.status(400).json({ status: 'error', message: error.details[0].message });
         }
-        const { account, _id } = value;
+        const { account, _id, updatedBy } = value;
+        const admin = await adminUtils.isAdmin({ _id: updatedBy, role: "admin" });
+        if (!admin) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.userNotAuthorizedUpdate,
+            });
+        }
         const accountExists = await AccountUtils.AccountExists({ _id: account });
 
         if (!accountExists) {
@@ -105,7 +115,16 @@ exports.updateAmad = async (req, res) => {
 
 exports.deleteAmad = async (req, res) => {
     try {
-        const { _id } = req.body;
+        const { _id, updatedBy } = req.body;
+
+        const admin = await adminUtils.isAdmin({ _id: updatedBy, role: "admin" });
+        if (!admin) {
+            return res.jsonp({
+                status: STATUS_MESSAGES.error,
+                messageId: 400,
+                message: STATUS_MESSAGES.userNotAuthorizedDelete,
+            });
+        }
         const amadToSoftDelete = await AmadObj.findOne({ _id, isDeleted: false });
 
         if (!amadToSoftDelete) {
