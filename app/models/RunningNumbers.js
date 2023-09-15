@@ -12,6 +12,10 @@ const RunningNumberSchema = new Schema({
     amadSrNoValue: { type: Number },
     nikasiSrNoKey: String,
     nikasiSrNoValue: { type: Number },
+    paymentSrNoKey: String,
+    paymentSrNoValue: { type: Number },
+    receiptSrNoKey: String,
+    receiptSrNoValue: { type: Number },
     bardanaSrNoKey: String,
     bardanaSrNoValue: { type: Number },
 
