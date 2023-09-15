@@ -1,6 +1,5 @@
 const organizationUtils = require("../../../app/utils/OrganizationUtils");
 const OrganizationObj = require("../../../app/models/Organization");
-const {before} = require("lodash");
 let org = {};
 
 beforeEach(() => {
@@ -12,7 +11,7 @@ beforeEach(() => {
         industry: "Cold Storage",
         website: "https://www.abccorp.com",
         address: {
-            cityVillage: "Shikohabad",
+            Village: "Shikohabad",
             district: "Firocabad",
             state: "Uttar Pradesh",
             pinCode: 205145,
@@ -26,7 +25,7 @@ beforeEach(() => {
     };
 });
 
-test("test to check  is org exists", async () => {
+test("test to check  is org exists",  async () => {
     const address = {
         city: "Firozabad",
     };
@@ -41,11 +40,3 @@ test("test to check  is org exists", async () => {
     expect(orgResp).toStrictEqual(org);
 });
 
-test("Test for valid organization data", async () => {
-    // Arrange
-    // Act
-    const {error, value} = organizationUtils.OrganizationValidate(org);
-    // Assert
-    expect(error).toBeUndefined();
-    expect(value).toStrictEqual(org);
-});

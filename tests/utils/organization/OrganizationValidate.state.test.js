@@ -11,36 +11,35 @@ beforeEach(() => {
         industry: "Cold Storage",
         website: "https://www.abccorp.com",
         address: {
-            cityVillage: "Shikohabad", district: "Firocabad", state: "Uttar Pradesh", pinCode: 205145,
+            village: "Shikohabad",
+            district: "Firocabad",
+            tehsil: "Shikohabad",
+            state: "Uttar Pradesh",
+            pinCode: 205145,
         },
         logo: {
             originalName: "logo.png", location: "https://www.abccorp.com/logo.png", key: "logo_123",
         },
         owner: ["Rajendra Prasad", "Ram Gopal", "Mohan Dutt"],
-    };
+    }
 });
 test('should pass validation for a valid INDIA state abbreviation', () => {
-    const validState = {
-        state: 'CA',
-    };
     const { error, value } = organizationUtils.OrganizationValidate(org);
     expect(error).toBeUndefined();
-    expect(value.state).toEqual('org');
+    expect(value).toEqual(org);
 });
 
 test('should fail validation for an invalid state abbreviation', () => {
-    const invalidState = {
-        state: 'XX', // Invalid state code
-    };
+    org.address.State = "NJ";
     const { error } = organizationUtils.OrganizationValidate(org);
     expect(error).not.toBeUndefined();
-    expect(error.details[0].message).toContain('"state" must be one of [AL, AK, ...]');
+    expect(error.details[0].message).toContain("\"address.State\" is not allowed");
 });
 
 test('should fail validation when state field is missing', () => {
-    const missingState = {};
+     delete org.address.state;
     const { error } = organizationUtils.OrganizationValidate(org);
     expect(error).not.toBeUndefined();
-    expect(error.details[0].message).toContain('"state" is required');
+    expect(error.details[0].message).toContain("\"address.state\" is required");
 });
 

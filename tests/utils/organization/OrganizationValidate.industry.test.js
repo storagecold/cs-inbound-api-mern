@@ -12,18 +12,17 @@ beforeEach(() => {
         industry: "Cold Storage",
         website: "https://www.abccorp.com",
         address: {
-            cityVillage: "Shikohabad",
+            village: "Shikohabad",
             district: "Firocabad",
+            tehsil: "Shikohabad",
             state: "Uttar Pradesh",
             pinCode: 205145,
         },
         logo: {
-            originalName: "logo.png",
-            location: "https://www.abccorp.com/logo.png",
-            key: "logo_123",
+            originalName: "logo.png", location: "https://www.abccorp.com/logo.png", key: "logo_123",
         },
         owner: ["Rajendra Prasad", "Ram Gopal", "Mohan Dutt"],
-    };
+    }
 });
 
 
