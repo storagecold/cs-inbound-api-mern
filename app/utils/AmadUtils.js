@@ -1,6 +1,5 @@
 const Joi = require('joi');
 const AmadObj = require('../models/Amad');
-const NikasiObj = require('../models/Nikasi');
 const RunningNumberObj = require('../models/RunningNumbers');
 
 module.exports = {
