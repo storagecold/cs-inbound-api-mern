@@ -48,7 +48,11 @@ module.exports = {
                     .max(15)
                     .pattern(/^[a-zA-Z\s]+$/)
                     .required(),
-            pinCode: Joi.number().integer()
+           pinCode: Joi.number()
+                    .integer()
+                    .min(100000)
+                    .max(999999)
+                    .required(),
         });
         const bankAccountSchema = Joi.object({
             accNumber: Joi.number().required(),
