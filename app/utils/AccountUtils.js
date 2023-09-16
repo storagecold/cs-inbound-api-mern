@@ -38,10 +38,11 @@ module.exports = {
                     .pattern(/^[a-zA-Z\s]+$/)
                     .required(),
             district: Joi.string()
-                .trim()
-                .min(3)
-                .max(50)
-                .regex(/^[a-zA-Z\s]+$/),
+                    .trim()
+                    .min(3)
+                    .max(15)
+                    .pattern(/^[a-zA-Z\s]+$/)
+                    .required(),
            state: Joi.string()
                     .trim()
                     .min(3)
