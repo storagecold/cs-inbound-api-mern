@@ -31,11 +31,12 @@ module.exports = {
                 .min(3)
                 .max(15)
                 .regex(/^[a-zA-Z\s]+$/),
-            tehsil: Joi.string()
-                .trim()
-                .min(3)
-                .max(15)
-                .regex(/^[a-zA-Z\s]+$/),
+             tehsil: Joi.string()
+                    .trim()
+                    .min(3)
+                    .max(30)
+                    .pattern(/^[a-zA-Z\s]+$/)
+                    .required(),
             district: Joi.string()
                 .trim()
                 .min(3)
