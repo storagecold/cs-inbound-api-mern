@@ -46,7 +46,8 @@ const amadRoutes = require("./app/routes/AmadRoutes");
 const addressRoutes = require("./app/routes/AddressRoutes");
 const partyLedgerRoutes = require("./app/routes/PartyLedgerRoutes");
 const nikasiRoutes = require("./app/routes/NikasiRoutes");
-
+const accessTokenRoutes = require("./app/routes/AccessToken");
+app.use("/api/v1/accessToken", accessTokenRoutes);
 app.use("/api/v1/", userAuthRoutes);
 app.use("/api/v1/", organizationRoutes);
 app.use("/api/v1/", companyRoutes);
