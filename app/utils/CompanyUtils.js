@@ -61,8 +61,12 @@ module.exports = {
                     .max(15)
                     .pattern(/^[a-zA-Z\s]+$/)
                     .required(),
-                pinCode: Joi.number(),
-            }).required(),
+              pinCode: Joi.number()
+            .integer()
+            .min(100000)
+            .max(999999)
+            .required(),
+      }).required(),
             logo: Joi.object(),
             isDeleted: Joi.boolean(),
             deletedAt: Joi.date().allow(null),
