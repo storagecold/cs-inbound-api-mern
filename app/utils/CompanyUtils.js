@@ -23,7 +23,12 @@ module.exports = {
             mobile: Joi.string()
                 .regex(/^[0-9]{10}$/)
                 .required(),
-            industry: Joi.string(),
+                  industry: Joi.string()
+        .trim()
+        .min(3)
+        .max(15)
+        .pattern(/^[a-zA-Z\s]+$/)
+        .required(),
             website: Joi.string(),
             address: Joi.object({
                 addressLine1: Joi.string().trim().min(3).max(255).required(),
