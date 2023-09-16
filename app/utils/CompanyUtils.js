@@ -29,7 +29,11 @@ module.exports = {
         .max(15)
         .pattern(/^[a-zA-Z\s]+$/)
         .required(),
-            website: Joi.string(),
+             website: Joi.string()
+                .uri({ scheme: ['http', 'https'] })
+                .trim()
+                .max(255)
+                .required(),
             address: Joi.object({
                 addressLine1: Joi.string().trim().min(3).max(255).required(),
                 addressLine2: Joi.string().trim().min(3).max(255).optional(),
