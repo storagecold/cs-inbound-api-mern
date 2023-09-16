@@ -42,11 +42,12 @@ module.exports = {
                 .min(3)
                 .max(50)
                 .regex(/^[a-zA-Z\s]+$/),
-            state: Joi.string()
-                .trim()
-                .min(3)
-                .max(50)
-                .regex(/^[a-zA-Z\s]+$/),
+           state: Joi.string()
+                    .trim()
+                    .min(3)
+                    .max(15)
+                    .pattern(/^[a-zA-Z\s]+$/)
+                    .required(),
             pinCode: Joi.number().integer()
         });
         const bankAccountSchema = Joi.object({
