@@ -1,5 +1,5 @@
-const CompanyObj = require("../../../app/models/Company");
-const CompanyUtils = require("../../../app/utils/CompanyUtils");
+const companyObj = require("../../../app/models/Company");
+const companyUtils = require("../../../app/utils/CompanyUtils");
 let company = {};
 
 beforeEach(() => {
@@ -23,13 +23,13 @@ beforeEach(() => {
         "industry": "Technology",
         "website": "https://www.example.com",
         "address": {
-            "addressLine1": "Lodhi Rajput ",
+            "addressLine1": "Lodhi Rajput",
             "addressLine2": "Etah Road",
             "village": "Sankhini",
             "tehsil": "Shikohabad",
             "district": "Firozabad",
             "state": "Uttar Pradesh",
-            "pinCode": "12345"
+            "pinCode":  205145,
         },
         "logo": {
             "url": "https://www.example.com/logo.png",
@@ -58,7 +58,7 @@ test("test to check  is company exists", async () => {
         "companyCode": "LRCOLD",
     }
 
-    jest.spyOn(CompanyObj, "findOne").mockReturnValue(company);
-    const compResp = await CompanyUtils.CompanyExists(companyQuery);
+    jest.spyOn(companyObj, "findOne").mockReturnValue(company);
+    const compResp = await companyUtils.companyExists(companyQuery);
     expect(compResp).toStrictEqual(company);
 });

@@ -30,7 +30,7 @@ const AccountSchema = new Schema({
     pinCode: Number
   },
   mobile: Number,
-  adharNo: Number,
+  adharNo: String,
   panNO: String,
   email: String,
   bankDetails: [{

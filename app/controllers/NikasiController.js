@@ -2,7 +2,7 @@ const AmadObj = require('../models/Amad');
 const AccountUtils = require('../utils/AccountUtils');
 const NikasiUtils = require('../utils/NikasiUtils');
 const NikasiObj = require('../models/Nikasi');
-const adminUtils = require('../utils/AdminUtils');
+const adminUtils = require('../utils/UserUtils');
 const STATUS_MESSAGES = {
     success: 'success',
     error: 'error',

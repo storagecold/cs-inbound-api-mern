@@ -26,23 +26,23 @@ beforeEach(() => {
 });
 
 test('should  be pass  for valid email', () => {
-    const { error, value } = organizationUtils.OrganizationValidate(org);
+    const { error, value } = organizationUtils.organizationValidate(org);
     expect(error).toBeUndefined();
     expect(value).toEqual(org);
 });
 
 test("Validation Error for Invalid Email", async () => {
     org.email = "lodhirajputcorporationgmail.com";
-    const {error, value} = organizationUtils.OrganizationValidate(org);
+    const {error, value} = organizationUtils.organizationValidate(org);
     expect(error).toBeDefined();
     expect(error.message).toBe('"email" must be a valid email');
 });
 
 test("Validation Error for Missing Email", async () => {
     delete org.email;
-    const {error, value} = organizationUtils.OrganizationValidate(org);
+    const {error, value} = organizationUtils.organizationValidate(org);
     expect(error).toBeDefined();
     expect(error.message).toBe('"email" is required');
 });
 
-test
+

@@ -26,7 +26,7 @@ beforeEach(() => {
 });
 
 test('should pass validation for a valid logo object', () => {
-    const {error, value} = organizationUtils.OrganizationValidate(org);
+    const {error, value} = organizationUtils.organizationValidate(org);
     expect(error).toBeUndefined();
     expect(value.logo).toEqual(org.logo);
 });

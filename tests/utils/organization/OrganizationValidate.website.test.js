@@ -24,34 +24,34 @@ beforeEach(() => {
 });
 
 test('should pass validation for a valid website URL', () => {
-    const {error, value} = organizationUtils.OrganizationValidate(org);
+    const {error, value} = organizationUtils.organizationValidate(org);
     expect(value.website).toBe('https://www.abccorp.com');
 });
 
 test('should fail validation for an invalid website URL', () => {
     org.website = 'invalid-website';
-    const {error} = organizationUtils.OrganizationValidate(org);
+    const {error} = organizationUtils.organizationValidate(org);
     expect(error).not.toBeUndefined();
     expect(error.details[0].message).toContain('website" must be a valid uri with a scheme matching the http|https pattern');
 });
 
 test('should fail validation when website is too long', () => {
     org.website = 'https://' + 'a'.repeat(256); // Exceeds the maximum length
-    const {error} = organizationUtils.OrganizationValidate(org);
+    const {error} = organizationUtils.organizationValidate(org);
     expect(error).not.toBeUndefined();
     expect(error.details[0].message).toContain('"website" must be a valid uri with a scheme matching the http|https pattern');
 });
 
 test('should fail validation when website field is missing', () => {
     delete org.website;
-    const {error} = organizationUtils.OrganizationValidate(org);
+    const {error} = organizationUtils.organizationValidate(org);
     expect(error).not.toBeUndefined();
     expect(error.details[0].message).toContain('"website" is required');
 });
 
 test('should fail validation when website does not start with http or https', () => {
     org.Website = 'ftp://www.example.com';
-    const {error} = organizationUtils.OrganizationValidate(org);
+    const {error} = organizationUtils.organizationValidate(org);
     expect(error).not.toBeUndefined();
     expect(error.details[0].message).toContain('"Website" is not allowed');
 });

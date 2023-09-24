@@ -1,7 +1,7 @@
 const AmadObj = require('../models/Amad');
 const AmadUtils = require('../utils/AmadUtils')
 const AccountUtils = require('../utils/AccountUtils')
-const adminUtils = require('../utils/AdminUtils')
+const adminUtils = require('../utils/UserUtils')
 const STATUS_MESSAGES = {
     success: 'success',
     error: 'error',

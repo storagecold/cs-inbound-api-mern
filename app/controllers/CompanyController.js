@@ -3,7 +3,7 @@ const globalModules = require('../helpers/globalModules');
 const CompanyUtils = require('../utils/CompanyUtils');
 const OrganizationUtils = require('../utils/OrganizationUtils');
 const addressUtils = require('../utils/AddressUtils');
-const adminUtils = require('../utils/AdminUtils');
+const adminUtils = require('../utils/UserUtils');
 
 const STATUS_MESSAGES = {
     success: 'success',

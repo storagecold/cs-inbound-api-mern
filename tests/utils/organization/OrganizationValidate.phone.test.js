@@ -30,7 +30,7 @@ test("Validation Error for Invalid Phone", async () => {
     org.phone = "(02299)12875678";
 
     // Act
-    const {error, value} = organizationUtils.OrganizationValidate(org);
+    const {error, value} = organizationUtils.organizationValidate(org);
 
     // Assert
     expect(error).toBeDefined();
@@ -46,7 +46,7 @@ test("Validation Error for Invalid Phone number, having character", async () => 
     org.phone = "(02299) #12875678";
 
     // Act
-    const {error, value} = organizationUtils.OrganizationValidate(org);
+    const {error, value} = organizationUtils.organizationValidate(org);
 
     // Assert
     expect(error).toBeDefined();
@@ -60,7 +60,7 @@ test("Validation Error for Invalid Phone number, having numeric value", async ()
     org.phone = 123456;
 
     // Act
-    const {error, value} = organizationUtils.OrganizationValidate(org);
+    const {error, value} = organizationUtils.organizationValidate(org);
 
     // Assert
     expect(error).toBeDefined();

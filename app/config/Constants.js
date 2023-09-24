@@ -5,6 +5,7 @@ const messages = {
     // AES encryption key
     "SuccessRetrievingData": "Data successfully retreived.",
     "ErrorRetrievingData": "Something went wrong. Please try again.",
+    "ErrorSigningUpUser": "Error while signing up user.",
     "UnauthorizedAccessError": "You are not authorized to access. Please contact us at contact@fleetfixy.com",
     "UnauthorizedAction": "You are not authorized to perform this action. Please contact your company admin.",
     "VerificationEmail": "We have sent a verification code to your email address",

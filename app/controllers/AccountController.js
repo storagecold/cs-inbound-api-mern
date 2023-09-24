@@ -1,7 +1,7 @@
-const AccountObj = require('../models/Account');
+const accountObj = require('../models/Account');
 const globalModules = require('../helpers/globalModules');
-const AccountUtils = require('../utils/AccountUtils');
-const CompanyUtils = require('../utils/CompanyUtils');
+const accountUtils = require('../utils/AccountUtils');
+const companyUtils = require('../utils/CompanyUtils');
 const addressUtils = require('../utils/AddressUtils');
 
 const STATUS_MESSAGES = {
@@ -26,7 +26,7 @@ const STATUS_MESSAGES = {
 
 exports.createAccount = async (req, res) => {
     try {
-        const { error, value } = AccountUtils.AccountValidate(req.body);
+        const { error, value } = accountUtils.accountValidate(req.body);
         if (error) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -35,7 +35,7 @@ exports.createAccount = async (req, res) => {
             });
         }
 
-        const companyExists = await CompanyUtils.CompanyExists({ _id: value.company });
+        const companyExists = await companyUtils.companyExists({ _id: value.company });
         if (!companyExists) {
             return res.json({
                 status: STATUS_MESSAGES.error,
@@ -56,7 +56,7 @@ exports.createAccount = async (req, res) => {
             'address.district': address.district,
             'address.state': address.state
         }
-        const accountExists = await AccountUtils.AccountExists(accountQuery);
+        const accountExists = await accountUtils.accountExists(accountQuery);
         if (accountExists) {
             return res.json({
                 status: STATUS_MESSAGES.error,
@@ -79,9 +79,9 @@ exports.createAccount = async (req, res) => {
             });
         };
 
-        await AccountUtils.GetAccountNumber(value);
+        await accountUtils.getAccountNumber(value);
 
-        const newAccount = new AccountObj(value);
+        const newAccount = new accountObj(value);
         const savedAccount = await newAccount.save();
 
         return res.jsonp({
@@ -101,7 +101,7 @@ exports.createAccount = async (req, res) => {
 
 exports.updateAccount = async (req, res) => {
     try {
-        const { error, value } = AccountUtils.AccountValidate(req.body);
+        const { error, value } = accountUtils.AccountValidate(req.body);
         if (error) {
             return res.jsonp({
                 status: STATUS_MESSAGES.error,
@@ -111,7 +111,7 @@ exports.updateAccount = async (req, res) => {
         }
         let { company, firstName, lastName, _id, address } = value;
 
-        const companyExists = await CompanyUtils.CompanyExists({ _id: company });
+        const companyExists = await companyUtils.CompanyExists({ _id: company });
         if (!companyExists) {
             return res.json({
                 status: STATUS_MESSAGES.error,
@@ -137,7 +137,7 @@ exports.updateAccount = async (req, res) => {
             });
         };
 
-        let existingAccount = await AccountObj.findOne({ _id });
+        let existingAccount = await accountObj.findOne({ _id });
 
         if (!existingAccount) {
             return res.jsonp({
@@ -168,7 +168,7 @@ exports.updateAccount = async (req, res) => {
 exports.deleteAccount = async (req, res) => {
     try {
         const accountId = req.params.id;
-        const accountToSoftDelete = await AccountObj.findOne({ _id: accountId, isDeleted: false });
+        const accountToSoftDelete = await accountObj.findOne({ _id: accountId, isDeleted: false });
 
         if (!accountToSoftDelete) {
             return res.jsonp({
@@ -199,7 +199,7 @@ exports.deleteAccount = async (req, res) => {
 exports.restoreAccount = async (req, res) => {
     try {
         const accountId = req.params.id;
-        const accountToRestore = await AccountObj.findOne({ _id: accountId, isDeleted: true });
+        const accountToRestore = await accountObj.findOne({ _id: accountId, isDeleted: true });
 
         if (!accountToRestore) {
             return res.jsonp({
@@ -240,14 +240,14 @@ exports.getAccountsList = async (req, res) => {
             isDeleted: false
         }
 
-        const data = await AccountObj.find(query)
+        const data = await accountObj.find(query)
             .populate('company', 'name')
             .populate('createdBy', 'role email')
             .populate('updatedBy', 'role email')
             .skip((perPage * page) - perPage)
             .limit(perPage)
             .sort({ updatedAt: -1 });
-        const totalCount = await AccountObj.countDocuments(query);
+        const totalCount = await accountObj.countDocuments(query);
 
         return res.jsonp({
             status: STATUS_MESSAGES.success,
@@ -267,7 +267,7 @@ exports.getAccountsList = async (req, res) => {
 exports.getAccountById = async (req, res) => {
     try {
         const accountId = req.params.id;
-        const account = await AccountObj.findOne({ _id: accountId, isDeleted: false });
+        const account = await accountObj.findOne({ _id: accountId, isDeleted: false });
 
         if (!account) {
             return res.jsonp({
@@ -308,8 +308,8 @@ exports.searchAccount = async (req, res) => {
             };
         }
 
-        const accountsList = await AccountObj.find(query);
-        const totalCount = await AccountObj.countDocuments(query);
+        const accountsList = await accountObj.find(query);
+        const totalCount = await accountObj.countDocuments(query);
 
         return res.jsonp({
             status: STATUS_MESSAGES.success,

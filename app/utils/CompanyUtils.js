@@ -2,16 +2,27 @@ const CompanyObj = require("../models/Company");
 const Joi = require("joi");
 
 module.exports = {
-    CompanyExists: async function (query) {
+    companyExists: async function (query) {
         return await CompanyObj.findOne(query);
     },
-    ComapnyValidate: function (body) {
+    comapnyValidate: function (body) {
         const schema = Joi.object({
-            companyCode: Joi.string().required(),
-            organization: Joi.string().required(),
+            companyCode: Joi.string()
+                .trim()
+                .alphanum()
+                .min(8)
+                .max(20)
+                .required(),
+            organization: Joi.string()
+                .trim()
+                .min(1)
+                .required(),
             chamberNo: Joi.array().items(
-                Joi.number().integer().valid(1, 2, 3, 4).required()
-            ),
+                Joi.number()
+                    .integer()
+                    .min(1).max(10)
+                    .required()
+            ).required(),
             name: Joi.string()
                 .trim()
                 .min(3)
@@ -23,14 +34,14 @@ module.exports = {
             mobile: Joi.string()
                 .regex(/^[0-9]{10}$/)
                 .required(),
-                  industry: Joi.string()
-        .trim()
-        .min(3)
-        .max(15)
-        .pattern(/^[a-zA-Z\s]+$/)
-        .required(),
-             website: Joi.string()
-                .uri({ scheme: ['http', 'https'] })
+            industry: Joi.string()
+                .trim()
+                .min(3)
+                .max(15)
+                .pattern(/^[a-zA-Z\s]+$/)
+                .required(),
+            website: Joi.string()
+                .uri({scheme: ['http', 'https']})
                 .trim()
                 .max(255)
                 .required(),
@@ -61,12 +72,12 @@ module.exports = {
                     .max(15)
                     .pattern(/^[a-zA-Z\s]+$/)
                     .required(),
-              pinCode: Joi.number()
-            .integer()
-            .min(100000)
-            .max(999999)
-            .required(),
-      }).required(),
+                pinCode: Joi.number()
+                    .integer()
+                    .min(100000)
+                    .max(999999)
+                    .required(),
+            }).required(),
             logo: Joi.object(),
             isDeleted: Joi.boolean(),
             deletedAt: Joi.date().allow(null),

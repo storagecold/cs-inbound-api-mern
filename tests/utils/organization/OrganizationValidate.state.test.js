@@ -24,21 +24,21 @@ beforeEach(() => {
     }
 });
 test('should pass validation for a valid INDIA state abbreviation', () => {
-    const { error, value } = organizationUtils.OrganizationValidate(org);
+    const { error, value } = organizationUtils.organizationValidate(org);
     expect(error).toBeUndefined();
     expect(value).toEqual(org);
 });
 
 test('should fail validation for an invalid state abbreviation', () => {
     org.address.State = "NJ";
-    const { error } = organizationUtils.OrganizationValidate(org);
+    const { error } = organizationUtils.organizationValidate(org);
     expect(error).not.toBeUndefined();
     expect(error.details[0].message).toContain("\"address.State\" is not allowed");
 });
 
 test('should fail validation when state field is missing', () => {
      delete org.address.state;
-    const { error } = organizationUtils.OrganizationValidate(org);
+    const { error } = organizationUtils.organizationValidate(org);
     expect(error).not.toBeUndefined();
     expect(error.details[0].message).toContain("\"address.state\" is required");
 });

@@ -1,24 +1,24 @@
 const Joi = require('joi');
-const PaymentObj = require('../models/Payment');
-const RunningNumberObj = require('../models/RunningNumbers');
+const paymentObj = require('../models/Payment');
+const runningNumberObj = require('../models/RunningNumbers');
 
 module.exports = {
-    PaymentExists: async function (query) {
+    paymentExists: async function (query) {
 
-        return await PaymentObj.findOne(query);
+        return await paymentObj.findOne(query);
     },
 
-    GetVoucherNo: async (value) => {
-        const query = { paymentSrNoKey: "paymentSrNoValue" };
-      
-        const update = { $inc: { paymentSrNoValue: 1 } };
-        const options = { new: true, upsert: true };
+    getVoucherNo: async (value) => {
+        const query = {paymentSrNoKey: "paymentSrNoValue"};
+
+        const update = {$inc: {paymentSrNoValue: 1}};
+        const options = {new: true, upsert: true};
 
         const runningNumber = await RunningNumberObj.findOneAndUpdate(query, update, options).exec();
 
         value.voucherNo = runningNumber ? runningNumber.paymentSrNoValue : 99999
     },
-   ValidateAmad : function (body) {
+    validateAmad: function (body) {
         const schema = Joi.object({
             company: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
             account: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),

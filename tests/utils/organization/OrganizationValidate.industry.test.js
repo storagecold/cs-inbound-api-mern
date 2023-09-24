@@ -27,7 +27,7 @@ beforeEach(() => {
 
 
 test('should pass validation for a valid industry name', () => {
-    const {error, value} = organizationUtils.OrganizationValidate(org);
+    const {error, value} = organizationUtils.organizationValidate(org);
     expect(error).toBeUndefined();
     expect(value).toEqual(org);
 });
@@ -36,35 +36,35 @@ test('should pass validation for a valid industry name', () => {
 
 test('should fail validation for an industry name less than 3 characters', () => {
     org.industry = 'Te';
-    const {error} = organizationUtils.OrganizationValidate(org);
+    const {error} = organizationUtils.organizationValidate(org);
     expect(error).not.toBeUndefined();
     expect(error.details[0].message).toContain('"industry" length must be at least 3');
 });
 
 test('should fail validation for an industry name exceeding 15 characters', () => {
     org.industry = 'ThisIsAReallyLongIndustryName';
-    const {error} = organizationUtils.OrganizationValidate(org);
+    const {error} = organizationUtils.organizationValidate(org);
     expect(error).not.toBeUndefined();
     expect(error.details[0].message).toContain('"industry" length must be less than or equal to 15');
 });
 
 test('should fail validation for an industry name containing special characters', () => {
     org.industry = 'Agriculture$';
-    const {error} = organizationUtils.OrganizationValidate(org);
+    const {error} = organizationUtils.organizationValidate(org);
     expect(error).not.toBeUndefined();
     expect(error.details[0].message).toContain('"industry" with value "Agriculture$" fails to match the required pattern');
 });
 
 test('should fail validation for an empty industry name', () => {
     org.industry = '';
-    const {error} = organizationUtils.OrganizationValidate(org);
+    const {error} = organizationUtils.organizationValidate(org);
     expect(error).not.toBeUndefined();
     expect(error.details[0].message).toContain('"industry" is not allowed to be empty');
 });
 
 test('should fail validation when industry is missing', () => {
     delete org.industry;
-    const {error} = organizationUtils.OrganizationValidate(org);
+    const {error} = organizationUtils.organizationValidate(org);
     expect(error).not.toBeUndefined();
     expect(error.details[0].message).toContain('"industry" is required');
 });

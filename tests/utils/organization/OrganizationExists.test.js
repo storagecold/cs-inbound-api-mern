@@ -36,7 +36,7 @@ test("test to check  is org exists",  async () => {
     };
 
     jest.spyOn(OrganizationObj, "findOne").mockReturnValue(org);
-    const orgResp = await organizationUtils.OrganizationExists(value);
+    const orgResp = await organizationUtils.organizationExists(value);
     expect(orgResp).toStrictEqual(org);
 });
 

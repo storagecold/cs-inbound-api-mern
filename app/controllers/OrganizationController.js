@@ -1,6 +1,6 @@
 const organizationObj = require('../models/Organization');
 const globalModules = require('../helpers/globalModules');
-const adminUtils = require('../utils/AdminUtils');
+const adminUtils = require('../utils/UserUtils');
 const addressUtils = require('../utils/AddressUtils');
 const Utils = require('../utils/OrganizationUtils');
 
@@ -21,7 +21,7 @@ const STATUS_MESSAGES = {
 
 exports.createOrganization = async (req, res) => {
     try {
-        const { error, value } = Utils.OrganizationValidate(req.body);
+        const { error, value } = Utils.organizationValidate(req.body);
         if (error) {
             return res.status(400).json({ status: STATUS_MESSAGES.error, message: error.details[0].message });
         }
