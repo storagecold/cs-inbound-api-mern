@@ -12,6 +12,9 @@ const path = require("path");
 const app = express();
 app.use(cors());
 
+app.use("/api/v1", (req, res) => {
+    res.send("cs-inbound-api-mern up and running!!!")
+});
 const http = require("http").Server(app);
 const socketio = require("socket.io");
 const io = socketio(http);
