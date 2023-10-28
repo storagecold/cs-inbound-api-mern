@@ -12,7 +12,7 @@ const path = require("path");
 const app = express();
 app.use(cors());
 
-app.use("/api/v1", (req, res) => {
+app.use("/", (req, res) => {
     res.send("cs-inbound-api-mern up and running!!!")
 });
 const http = require("http").Server(app);
